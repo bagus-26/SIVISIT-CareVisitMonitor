@@ -1,185 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
+@section('title', 'Dashboard')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - SIVISIT</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
+@section('content')
+<div class="sv-page-header sv-animate-in">
+    <div>
+        <h1>Selamat Datang, {{ Auth::user()->name ?? 'Petugas' }} 👋</h1>
+        <p>Ringkasan kondisi pasien home care hari ini, {{ now()->translatedFormat('d F Y') }}.</p>
+    </div>
+    <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">➕ Tambah Pasien</a>
+</div>
 
-        .sidebar {
-            min-height: 100vh;
-            background-color: #0d6efd;
-            color: white;
-        }
+{{-- Stat Cards --}}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-1">
+        <div class="sv-stat-card" style="--accent-color:#007AFF;">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Total Pasien</div>
+            <div class="stat-value" style="color:#007AFF;">{{ $totalPatients }}</div>
+            <div class="stat-sub">Pasien terdaftar</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-2">
+        <div class="sv-stat-card" style="--accent-color:#FF9500;">
+            <div class="stat-icon">📅</div>
+            <div class="stat-label">Kunjungan Hari Ini</div>
+            <div class="stat-value" style="color:#FF9500;">{{ $todayVisits }}</div>
+            <div class="stat-sub">Monitoring tercatat</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-3">
+        <div class="sv-stat-card" style="--accent-color:#FF3B30;">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-label">Perlu Kontrol</div>
+            <div class="stat-value" style="color:#FF3B30;">{{ $needControl }}</div>
+            <div class="stat-sub">Butuh tindak lanjut</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-4">
+        <div class="sv-stat-card" style="--accent-color:#34C759;">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Status Stabil</div>
+            <div class="stat-value" style="color:#34C759;">{{ $todayFinished }}</div>
+            <div class="stat-sub">Selesai hari ini</div>
+        </div>
+    </div>
+</div>
 
-        .sidebar a {
-            text-decoration: none;
-        }
-
-        .sidebar a.text-white:hover {
-            color: white !important;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-card {
-            border: none;
-            border-radius: 12px;
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 sidebar p-3 d-flex flex-column">
-                <h4 class="fw-bold text-center mb-4">SIVISIT</h4>
-                <hr>
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li class="nav-item mb-2">
-                        <a href="{{ route('admin.dashboard') }}" class="nav-link active bg-white text-primary fw-medium">🏠 Dashboard</a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="{{ route('admin.patients.index') }}" class="nav-link text-white px-3 py-2 d-block rounded">👥 Daftar Pasien</a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-white px-3 py-2 d-block rounded opacity-50">📅 Jadwal Kunjungan</a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-white px-3 py-2 d-block rounded opacity-50">📝 Rekam Medis</a>
-                    </li>
-                </ul>
-                <hr>
-                <div>
-                    <a href="{{ route('logout') }}" class="btn btn-danger btn-sm w-100 fw-medium">🚪 Keluar</a>
-                </div>
+<div class="row g-3">
+    {{-- Agenda Hari Ini --}}
+    <div class="col-12 col-xl-8 sv-animate-in">
+        <div class="sv-table-wrap">
+            <div class="sv-section-header">
+                <h5>📋 Agenda Kunjungan Hari Ini</h5>
+                <a href="{{ route('admin.monitorings.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
             </div>
-
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 p-4">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-4 border-bottom">
-                    <div>
-                        <h1 class="h2 fw-bold text-secondary mb-1">Dashboard Pemantauan</h1>
-                        <p class="text-muted small mb-0">Selamat datang kembali, <strong>{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</p>
-                    </div>
-                    <div>
-                        <span class="badge bg-primary px-3 py-2 rounded-pill">SISTEM MONITORING TERPADU</span>
-                    </div>
-                </div>
-
-                <!-- Statistics Cards -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <div class="card stat-card shadow-sm bg-white p-4">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted small uppercase tracking-wider d-block mb-1">Total Pasien Homecare</span>
-                                    <h3 class="fw-bold text-primary mb-0">{{ $totalPatients }} Orang</h3>
-                                </div>
-                                <span class="fs-1">👥</span>
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Jam</th>
+                        <th>Nama Pasien</th>
+                        <th>Alamat</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if($todayAgenda->isEmpty())
+                    <tr>
+                        <td colspan="5">
+                            <div class="sv-empty-state">
+                                <div class="empty-icon">📅</div>
+                                <p>Tidak ada agenda kunjungan hari ini.</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card shadow-sm bg-white p-4">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted small uppercase tracking-wider d-block mb-1">Kunjungan Hari Ini</span>
-                                    <h3 class="fw-bold text-warning mb-0">{{ $todayVisits }} Pasien</h3>
-                                </div>
-                                <span class="fs-1">📅</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card shadow-sm bg-white p-4">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <span class="text-muted small uppercase tracking-wider d-block mb-1">Tugas Selesai</span>
-                                    <h3 class="fw-bold text-success mb-0">{{ $todayFinished }} Selesai</h3>
-                                </div>
-                                <span class="fs-1">✅</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Agenda Section -->
-                <div class="card shadow-sm border-0 p-4 mb-4">
-                    <h5 class="fw-bold text-dark mb-3">📅 Agenda Kunjungan Rumah Hari Ini</h5>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Jam</th>
-                                    <th>Nama Pasien</th>
-                                    <th>Alamat Rumah</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if($todayAgenda->isEmpty())
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted py-3">Tidak ada agenda kunjungan hari ini.</td>
-                                    </tr>
-                                @else
-                                    @foreach($todayAgenda as $agenda)
-                                        <tr>
-                                            <td class="fw-semibold text-primary">
-                                                {{ isset($agenda->monitoring_time) ? date('H:i', strtotime($agenda->monitoring_time)) : '--:--' }} WIB
-                                            </td>
-                                            <td class="fw-medium">
-                                                {{ $agenda->patient->patient_name ?? '-' }}
-                                            </td>
-                                            <td class="text-muted">
-                                                {{ $agenda->patient->address ?? '-' }}
-                                            </td>
-                                            <td>
-                                                @if(($agenda->status ?? '') === 'Stable')
-                                                    <span class="badge bg-success-subtle text-success px-2.5 py-1.5 rounded-pill">Selesai</span>
-                                                @else
-                                                    <span class="badge bg-warning-subtle text-warning px-2.5 py-1.5 rounded-pill">Tertunda / Belum</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('admin.patients.index') }}" class="btn btn-sm btn-outline-primary py-1">Detail</a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Disclaimer Alert -->
-                <div class="alert alert-warning shadow-sm border-0 d-flex align-items-start gap-2 mb-0" role="alert">
-                    <span class="fs-5">⚠️</span>
-                    <div>
-                        <strong>Disclaimer:</strong> Seluruh data yang ditampilkan pada sistem ini bersifat simulasi/dummy untuk keperluan monitoring administratif. Sistem ini tidak memberikan diagnosis medis mandiri; konsultasikan hasil monitoring kepada dokter profesional untuk tindakan medis lebih lanjut.
-                    </div>
-                </div>
-
-            </div>
+                        </td>
+                    </tr>
+                    @else
+                    @foreach($todayAgenda as $ag)
+                    <tr>
+                        <td style="font-weight:600;">
+                            {{ isset($ag->monitoring_time) ? \Carbon\Carbon::parse($ag->monitoring_time)->format('H:i') : '--:--' }} WIB
+                        </td>
+                        <td style="font-weight:500;">{{ $ag->patient->patient_name ?? '-' }}</td>
+                        <td style="color:#636366;font-size:12.5px;">{{ Str::limit($ag->patient->address ?? '-', 40) }}</td>
+                        <td>
+                            @php $s = strtolower($ag->status ?? ''); @endphp
+                            @if(str_contains($s,'stable') || str_contains($s,'stabil'))
+                                <span class="sv-badge sv-badge-stable">✅ Stabil</span>
+                            @elseif(str_contains($s,'referral') || str_contains($s,'rujukan'))
+                                <span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>
+                            @else
+                                <span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>
+                            @endif
+                        </td>
+                        <td>
+                            <a href="{{ route('admin.monitorings.show', $ag->id) }}"
+                               class="btn btn-sm btn-outline-primary py-0" style="font-size:12px;">Detail</a>
+                        </td>
+                    </tr>
+                    @endforeach
+                    @endif
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    {{-- Quick Actions --}}
+    <div class="col-12 col-xl-4 sv-animate-in">
+        <div class="sv-card h-100">
+            <h5 style="font-size:15px;font-weight:600;margin-bottom:6px;">🔍 Cari Pasien Cepat</h5>
+            <p style="font-size:13px;color:#636366;margin-bottom:16px;">Masukkan kode pasien atau NIK untuk melihat riwayat monitoring.</p>
+            <form action="{{ route('admin.patients.search') }}" method="GET">
+                <div class="mb-3">
+                    <input type="text" name="q" class="form-control" placeholder="Kode pasien / NIK...">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Cari Data Monitoring</button>
+            </form>
+            <hr style="border-color:#F0F2F5;margin:20px 0;">
+            <h6 style="font-size:13px;font-weight:600;color:#636366;margin-bottom:12px;">AKSI CEPAT</h6>
+            <div class="d-flex flex-column gap-2">
+                <a href="{{ route('admin.patients.create') }}" class="btn btn-sm btn-outline-primary">➕ Tambah Pasien Baru</a>
+                <a href="{{ route('admin.monitorings.create') }}" class="btn btn-sm btn-outline-secondary">🩺 Catat Monitoring</a>
+                <a href="{{ route('admin.monitorings.index') }}" class="btn btn-sm btn-outline-secondary">📋 Lihat Semua Monitoring</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-</html>
+{{-- Disclaimer --}}
+<div class="alert alert-warning mt-4 d-flex align-items-start gap-2" role="alert">
+    <span>⚠️</span>
+    <div><strong>Disclaimer:</strong> Seluruh data bersifat simulasi/dummy. Sistem ini tidak memberikan diagnosis medis mandiri.</div>
+</div>
+@endsection

@@ -20,12 +20,16 @@ class DashboardController extends Controller
             ->where('status', 'Stable')
             ->count();
 
+        $needControl = Monitoring::query()
+            ->where('status', 'Need Control')
+            ->count();
+
         $todayAgenda = Monitoring::query()
             ->with('patient')
             ->where('monitoring_date', $todayDate)
             ->orderBy('monitoring_time')
             ->get();
 
-        return view('admin.dashboard', compact('totalPatients', 'todayVisits', 'todayFinished', 'todayAgenda'));
+        return view('admin.dashboard', compact('totalPatients', 'todayVisits', 'todayFinished', 'todayAgenda', 'needControl'));
     }
 }

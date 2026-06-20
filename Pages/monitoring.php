@@ -180,12 +180,13 @@ function getStatusBadge($status) {
                                 <th>Rekomendasi / Catatan</th>
                                 <th>Status</th>
                                 <th>Petugas</th>
+                                <th style="text-align:right;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="monBody">
                             <?php if (empty($monitorings)): ?>
                                 <tr>
-                                    <td colspan="8">
+                                    <td colspan="9">
                                         <div class="sv-empty-state">
                                             <div class="empty-icon">🩺</div>
                                             <p>Belum ada catatan monitoring. <a href="tambah-monitoring.php">Catat monitoring pertama →</a></p>
@@ -227,6 +228,11 @@ function getStatusBadge($status) {
                                     <td><?= getStatusBadge($m['status'] ?? '') ?></td>
                                     <td style="font-size:12px;color:#636366;">
                                         <?= htmlspecialchars($m['user']['name'] ?? 'Petugas') ?>
+                                    </td>
+                                    <td style="text-align:right;">
+                                         <a href="detail-monitoring.php?id=<?= (int)($m['id'] ?? 0) ?>"
+                                            class="btn btn-sm btn-outline-primary py-0"
+                                            style="font-size:11.5px;">Detail</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

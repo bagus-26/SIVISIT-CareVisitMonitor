@@ -19,12 +19,20 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admincarevisit@2026.dev',
             'password' => Hash::make('password'),
+            'role' => 'Koordinator Layanan',
+            'nip' => '199208152019031002',
+            'phone' => '081234567890',
+            'location' => 'Puskesmas Dinoyo, Malang',
         ]);
 
         $testUser = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
+            'role' => 'Perawat Home Care',
+            'nip' => '199504102021022003',
+            'phone' => '082345678901',
+            'location' => 'Puskesmas Dinoyo, Malang',
         ]);
 
         $p1 = Patient::create([

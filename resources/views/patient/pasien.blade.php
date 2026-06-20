@@ -1,227 +1,177 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
+@section('title', 'Daftar Pasien')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Pasien - SIVISIT</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
+@section('content')
+<div class="sv-page-header sv-animate-in">
+    <div>
+        <h1>Daftar Pasien Binaan</h1>
+        <p>Kelola data pasien binaan home care SIVISIT.</p>
+    </div>
+    <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">➕ Tambah Pasien Baru</a>
+</div>
 
-        .sidebar {
-            min-height: 100vh;
-            background-color: #0d6efd;
-            color: white;
-        }
+@if(session('success'))
+<div class="alert alert-success d-flex align-items-center gap-2 mb-4 sv-animate-in" role="alert">
+    <span>✅</span><span>{{ session('success') }}</span>
+</div>
+@endif
 
-        .sidebar a {
-            text-decoration: none;
-        }
+<div class="sv-table-wrap sv-animate-in">
+    <div class="sv-section-header">
+        <h5>👥 Data Pasien Binaan</h5>
+        <span style="font-size:12px;color:#8E8E93;">{{ $patients->count() }} pasien terdaftar</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 50px;">No</th>
+                    <th>Kode Pasien</th>
+                    <th>Nama Pasien</th>
+                    <th>Usia</th>
+                    <th>Diagnosa Medis</th>
+                    <th>Alamat</th>
+                    <th style="text-align:right;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($patients as $index => $p)
+                    @php
+                        $latestMonitoring = $p->monitorings->sortByDesc('created_at')->first();
+                        $diagnosa = $latestMonitoring ? ($latestMonitoring->symptoms ?? '-') : '-';
+                    @endphp
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td><strong style="color:var(--sv-blue);">{{ $p->patient_id }}</strong></td>
+                        <td class="fw-semibold">{{ $p->patient_name ?? '-' }}</td>
+                        <td>{{ isset($p->datebirth) ? \Carbon\Carbon::parse($p->datebirth)->age . ' Tahun' : '-' }}</td>
+                        <td>
+                            @if($diagnosa !== '-' && !empty($diagnosa))
+                                <span class="sv-badge sv-badge-referral">{{ $diagnosa }}</span>
+                            @else
+                                <span class="sv-badge bg-light text-muted">-</span>
+                            @endif
+                        </td>
+                        <td style="font-size:12.5px;color:var(--sv-text-sub);">{{ Str::limit($p->address ?? '-', 50) }}</td>
+                        <td style="text-align:right;">
+                            <div class="d-inline-flex gap-1">
+                                <button class="btn btn-sm btn-outline-primary py-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ $p->patient_id }}">Lihat</button>
+                                <a href="{{ route('admin.patients.edit', $p->patient_id) }}" class="btn btn-sm btn-outline-secondary py-1">Edit</a>
+                                <form action="{{ route('admin.patients.destroy', $p->patient_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pasien ini beserta riwayat monitoringnya?')" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">Hapus</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7">
+                            <div class="sv-empty-state">
+                                <div class="empty-icon">👥</div>
+                                <p>Belum ada data pasien terdaftar. <a href="{{ route('admin.patients.create') }}">Tambah pasien pertama →</a></p>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        .sidebar a.text-white:hover {
-            color: white !important;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3 col-lg-2 sidebar p-3 d-flex flex-column">
-                <h4 class="fw-bold text-center mb-4">SIVISIT</h4>
-                <hr>
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li class="nav-item mb-2">
-                        <a href="{{ route('admin.dashboard') }}" class="nav-link text-white px-3 py-2 d-block rounded">🏠 Dashboard</a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="{{ route('admin.patients.index') }}" class="nav-link active bg-white text-primary fw-medium">👥 Daftar Pasien</a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-white px-3 py-2 d-block rounded opacity-50">📅 Jadwal Kunjungan</a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-white px-3 py-2 d-block rounded opacity-50">📝 Rekam Medis</a>
-                    </li>
-                </ul>
-                <hr>
-                <div>
-                    <a href="{{ route('logout') }}" class="btn btn-danger btn-sm w-100 fw-medium">🚪 Keluar</a>
+{{-- Modals for details --}}
+@foreach ($patients as $p)
+    <div class="modal fade" id="viewModal{{ $p->patient_id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ $p->patient_id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+                <div class="modal-header" style="background:linear-gradient(135deg,var(--sv-navy),var(--sv-navy-mid));color:white;padding:20px 24px;border-radius:16px 16px 0 0;">
+                    <h5 class="modal-title" id="viewModalLabel{{ $p->patient_id }}">🏥 Detail Pasien: {{ $p->patient_name ?? '' }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-
-            <div class="col-md-9 col-lg-10 p-4">
-                <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2 fw-bold text-secondary">Kelola Data Pasien</h1>
-                    <a href="{{ route('admin.patients.create') }}" class="btn btn-primary btn-sm fw-medium">+ Tambah Pasien Baru</a>
-                </div>
-
-                @if(session('success'))
-                    <div class="alert alert-success shadow-sm border-0 mb-3" role="alert">
-                        🎉 {{ session('success') }}
+                <div class="modal-body" style="padding:24px;">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block">ID Pasien / No. RM</span>
+                            <strong>{{ $p->patient_id ?? '-' }}</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block">NIK Pasien</span>
+                            <strong>{{ $p->nik_dummy ?? '-' }}</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block">Kategori &amp; Gender</span>
+                            <strong>{{ $p->patient_category ?? '-' }} ({{ $p->gender === 'Male' ? 'Laki-laki' : 'Perempuan' }})</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block">Tanggal Lahir</span>
+                            <strong>{{ isset($p->datebirth) ? \Carbon\Carbon::parse($p->datebirth)->format('d M Y') : '-' }}</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block">Alamat Lengkap</span>
+                            <strong>📍 {{ $p->address ?? '-' }}</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted small d-block">Nomor Telepon Darurat</span>
+                            <strong>📞 {{ $p->family_phone ?? '-' }}</strong>
+                        </div>
                     </div>
-                @endif
 
-                <div class="card shadow-sm border-0 p-4">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama Pasien</th>
-                                    <th>Usia</th>
-                                    <th>Diagnosa Medis</th>
-                                    <th>Alamat</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if($patients->isEmpty())
+                    <hr style="border-color:#F0F2F5;">
+
+                    <h6 class="fw-bold text-primary mb-3">🩺 Riwayat Monitoring Kesehatan</h6>
+                    @if($p->monitorings->isEmpty())
+                        <div class="alert alert-light text-muted small mb-0">Belum ada catatan monitoring kesehatan untuk pasien ini.</div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered align-middle text-center small">
+                                <thead class="table-light">
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted py-3">Tidak ada data pasien.</td>
+                                        <th>Tanggal &amp; Jam</th>
+                                        <th>Tensi</th>
+                                        <th>Nadi</th>
+                                        <th>Nafas</th>
+                                        <th>Suhu</th>
+                                        <th>Saturasi O2</th>
+                                        <th>Gejala/Kondisi</th>
+                                        <th>Status</th>
                                     </tr>
-                                @else
-                                    @php $no = 1; @endphp
-                                    @foreach($patients as $p)
-                                        @php
-                                            $latestMonitoring = $p->monitorings->sortByDesc('created_at')->first();
-                                            $diagnosa = $latestMonitoring ? ($latestMonitoring->symptoms ?? '-') : '-';
-                                        @endphp
+                                </thead>
+                                <tbody>
+                                    @foreach($p->monitorings->sortByDesc('monitoring_date') as $mon)
                                         <tr>
-                                            <td>{{ $no++ }}</td>
-                                            <td class="fw-medium">{{ $p->patient_name ?? '-' }}</td>
-                                            <td>{{ isset($p->datebirth) ? \Carbon\Carbon::parse($p->datebirth)->age . ' Tahun' : '-' }}</td>
                                             <td>
-                                                @if($diagnosa !== '-' && !empty($diagnosa))
-                                                    <span class="badge bg-danger-subtle text-danger">{{ $diagnosa }}</span>
-                                                @else
-                                                    <span class="badge bg-light text-muted">-</span>
-                                                @endif
+                                                {{ isset($mon->monitoring_date) ? date('d-m-Y', strtotime($mon->monitoring_date)) : '' }}
+                                                {{ isset($mon->monitoring_time) ? ' ' . date('H:i', strtotime($mon->monitoring_time)) : '' }}
                                             </td>
-                                            <td>{{ $p->address ?? '-' }}</td>
+                                            <td>{{ $mon->blood_pressure ?? '-' }}</td>
+                                            <td>{{ $mon->heart_rate ?? '-' }} bpm</td>
+                                            <td>{{ $mon->respiratory_rate ?? '-' }} x/m</td>
+                                            <td>{{ $mon->body_temperature ?? '-' }} °C</td>
+                                            <td>{{ $mon->oxygen_saturation ?? '-' }}%</td>
+                                            <td>{{ $mon->symptoms ?? '-' }}</td>
                                             <td>
-                                                <div class="d-flex">
-                                                    <button class="btn btn-sm btn-info text-white py-1 me-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ $p->patient_id }}">Lihat</button>
-                                                    <a href="{{ route('admin.patients.edit', $p->patient_id) }}" class="btn btn-sm btn-warning text-white py-1 me-1">Edit</a>
-                                                    <form action="{{ route('admin.patients.destroy', $p->patient_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pasien ini beserta riwayat monitoringnya?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger py-1">Hapus</button>
-                                                    </form>
-                                                </div>
+                                                @if($mon->status === 'Stable')
+                                                    <span class="badge bg-success-subtle text-success">Stable</span>
+                                                @elseif($mon->status === 'Need Referral')
+                                                    <span class="badge bg-danger-subtle text-danger">Need Referral</span>
+                                                @else
+                                                    <span class="badge bg-warning-subtle text-warning">Need Control</span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
-
+                <div class="modal-footer" style="border-top:1px solid #F0F2F5;padding:16px 24px;border-radius:0 0 16px 16px;">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                    <a href="{{ route('admin.monitorings.create', ['patient_id' => $p->patient_id]) }}" class="btn btn-primary btn-sm">🩺 Tambah Monitoring</a>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Modals for details -->
-    @foreach ($patients as $p)
-        <div class="modal fade" id="viewModal{{ $p->patient_id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ $p->patient_id }}" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="viewModalLabel{{ $p->patient_id }}">Detail Pasien: {{ $p->patient_name ?? '' }}</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">ID Pasien / No. RM</span>
-                                <strong class="fs-6">{{ $p->patient_id ?? '-' }}</strong>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">NIK Pasien</span>
-                                <strong class="fs-6">{{ $p->nik_dummy ?? '-' }}</strong>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">Kategori & Gender</span>
-                                <strong class="fs-6">{{ $p->patient_category ?? '-' }} ({{ $p->gender ?? '-' }})</strong>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">Tanggal Lahir</span>
-                                <strong class="fs-6">{{ isset($p->datebirth) ? date('d M Y', strtotime($p->datebirth)) : '-' }}</strong>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">Alamat Lengkap</span>
-                                <strong class="fs-6">{{ $p->address ?? '-' }}</strong>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="text-muted small d-block">Nomor Telepon Darurat</span>
-                                <strong class="fs-6">{{ $p->family_phone ?? '-' }}</strong>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <h6 class="fw-bold text-primary mb-3">🩺 Riwayat Monitoring Kesehatan</h6>
-                        @if($p->monitorings->isEmpty())
-                            <div class="alert alert-light text-muted small mb-0">Belum ada catatan monitoring kesehatan untuk pasien ini.</div>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered align-middle text-center small">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Tanggal & Jam</th>
-                                            <th>Tensi</th>
-                                            <th>Nadi</th>
-                                            <th>Nafas</th>
-                                            <th>Suhu</th>
-                                            <th>Saturasi O2</th>
-                                            <th>Gejala/Kondisi</th>
-                                            <th>Catatan</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($p->monitorings->sortByDesc('monitoring_date') as $mon)
-                                            <tr>
-                                                <td>
-                                                    {{ isset($mon->monitoring_date) ? date('d-m-Y', strtotime($mon->monitoring_date)) : '' }}
-                                                    {{ isset($mon->monitoring_time) ? ' ' . date('H:i', strtotime($mon->monitoring_time)) : '' }}
-                                                </td>
-                                                <td>{{ $mon->blood_pressure ?? '-' }}</td>
-                                                <td>{{ $mon->heart_rate ?? '-' }} bpm</td>
-                                                <td>{{ $mon->respiratory_rate ?? '-' }} x/m</td>
-                                                <td>{{ $mon->body_temperature ?? '-' }} °C</td>
-                                                <td>{{ $mon->oxygen_saturation ?? '-' }}%</td>
-                                                <td>{{ $mon->symptoms ?? '-' }}</td>
-                                                <td>{{ $mon->notes ?? '-' }}</td>
-                                                <td>
-                                                    <span class="badge {{ ($mon->status === 'Stable') ? 'bg-success' : 'bg-danger' }}">
-                                                        {{ $mon->status }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endforeach
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+@endforeach
+@endsection

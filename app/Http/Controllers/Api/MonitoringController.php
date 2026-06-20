@@ -38,7 +38,7 @@ class MonitoringController extends Controller
             'oxygen_saturation' => 'nullable|integer',
             'symptoms' => 'nullable|string',
             'notes' => 'nullable|string',
-            'status' => 'required|in:Stable,Unstable',
+            'status' => 'required|in:Stable,Need Control,Need Referral',
 
         ]);
 

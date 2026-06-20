@@ -21,6 +21,8 @@ class Monitoring extends Model
         'symptoms',
         'notes',
         'status',
+        'monitoring_time',
+        'examination_focus',
     ];
 
     public function patient()

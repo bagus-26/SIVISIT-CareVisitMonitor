@@ -13,7 +13,8 @@ $navItems = [
     ['pasien.php',            '👥', 'Daftar Pasien',       ['pasien.php']],
     ['tambah-pasien.php',     '➕', 'Tambah Pasien',       ['tambah-pasien.php']],
     ['monitoring.php',        '📋', 'Data Monitoring',     ['monitoring.php']],
-    ['tambah-monitoring.php', '🩺', 'Catat Monitoring',    ['tambah-monitoring.php']],
+    ['tambah-monitoring.php', '🩺', 'Catat Monitoring',    ['tambah-monitoring.php', 'detail-monitoring.php']],
+    ['rekam-medis.php',       '📂', 'Rekam Medis',         ['rekam-medis.php']],
     ['cari-pasien.php',       '🔍', 'Cari Pasien',         ['cari-pasien.php']],
 ];
 ?>
@@ -48,13 +49,14 @@ $navItems = [
 
     <!-- Footer / Logout -->
     <div class="sv-sidebar-footer">
-        <div class="d-flex align-items-center gap-2 px-2 mb-3">
+        <a href="profil.php" class="d-flex align-items-center gap-2 px-2 mb-2 text-decoration-none sv-sidebar-profile <?= $currentPage === 'profil.php' ? 'active' : '' ?>">
             <div class="sv-avatar" style="width:32px;height:32px;font-size:12px;"><?= $userInitial ?></div>
-            <div style="overflow:hidden;">
+            <div style="overflow:hidden;flex:1;">
                 <div style="font-size:12px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= $userName ?></div>
                 <div style="font-size:10px;color:var(--sv-sidebar-txt);opacity:.7;"><?= $userRole ?></div>
             </div>
-        </div>
+            <span style="font-size:10px;color:var(--sv-sidebar-txt);opacity:.5;">✎</span>
+        </a>
         <a href="logout.php" class="sv-logout-btn">
             <span class="nav-icon">🚪</span>
             Keluar

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('oxygen_saturation')->nullable();
             $table->text('symptoms')->nullable();
             $table->text('notes')->nullable();
-            $table->enum('status', ['Stable', 'Unstable'])->default('Stable');
+            $table->enum('status', ['Stable', 'Need Control', 'Need Referral'])->default('Stable');
             $table->time('monitoring_time')->nullable();
             $table->string('examination_focus')->nullable();
             $table->timestamps();
