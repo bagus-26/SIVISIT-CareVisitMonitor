@@ -58,6 +58,9 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
     <title>Daftar Pasien — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="../frontend-CareVisitMonitor/pages/global.css" rel="stylesheet">
+    <link href="../frontend-CareVisitMonitor/pages/table.css" rel="stylesheet">
+    <link href="../frontend-CareVisitMonitor/pages/modal.css" rel="stylesheet">
     <style>
         .patient-avatar {
             width: 38px; height: 38px;

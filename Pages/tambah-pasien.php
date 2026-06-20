@@ -57,6 +57,7 @@ $suggestedId = 'RM-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_
     <title>Tambah Pasien — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="../frontend-CareVisitMonitor/pages/global.css" rel="stylesheet">
     <style>
         .form-section {
             background: white;

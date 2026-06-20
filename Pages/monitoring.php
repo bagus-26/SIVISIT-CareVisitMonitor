@@ -48,6 +48,8 @@ function getStatusBadge($status) {
     <title>Data Monitoring — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="../frontend-CareVisitMonitor/pages/global.css" rel="stylesheet">
+    <link href="../frontend-CareVisitMonitor/pages/table.css" rel="stylesheet">
     <style>
         .filter-tabs {
             display: flex;

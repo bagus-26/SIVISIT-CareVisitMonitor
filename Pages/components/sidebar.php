@@ -18,46 +18,47 @@ $navItems = [
 ];
 ?>
 <!-- SIDEBAR -->
-<div class="sv-sidebar" id="svSidebar">
+<div class="sidebar" id="sidebar">
     <!-- Brand -->
-    <div class="sv-sidebar-brand">
-        <div class="sv-sidebar-logo">SV</div>
-        <div class="sv-sidebar-brand-name">
-            <strong>SIVISIT</strong>
-            <span>CareVisit Monitor</span>
+    <div class="sidebar-header" style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">SV</div>
+        <div>
+            <div style="font-size: 1rem; line-height: 1.2;"><strong>MediAdmin</strong></div>
+            <div style="font-size: 0.75rem; font-weight: normal; color: rgba(255,255,255,0.7);">CareVisit Monitor</div>
         </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="sv-sidebar-nav">
-        <span class="sv-nav-section-label">Menu Utama</span>
+    <nav class="sidebar-menu">
+        <div style="padding: 0.5rem 1.5rem; font-size: 0.75rem; text-transform: uppercase; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-top: 0.5rem;">Menu Utama</div>
         <?php foreach ($navItems as [$href, $icon, $label, $pages]): ?>
             <?php $isActive = in_array($currentPage, $pages); ?>
-            <a href="<?= $href ?>" class="sv-nav-link <?= $isActive ? 'active' : '' ?>">
-                <span class="nav-icon"><?= $icon ?></span>
+            <a href="<?= $href ?>" class="sidebar-item <?= $isActive ? 'active' : '' ?>">
+                <span><?= $icon ?></span>
                 <?= $label ?>
             </a>
         <?php endforeach; ?>
 
-        <span class="sv-nav-section-label" style="margin-top:12px;">Akses Publik</span>
-        <a href="../index.php" class="sv-nav-link <?= $currentPage === 'index.php' ? 'active' : '' ?>">
-            <span class="nav-icon">🌐</span>
+        <div style="padding: 0.5rem 1.5rem; font-size: 0.75rem; text-transform: uppercase; color: rgba(255,255,255,0.5); letter-spacing: 1px; margin-top: 1.5rem;">Akses Publik</div>
+        <a href="../index.php" class="sidebar-item <?= $currentPage === 'index.php' ? 'active' : '' ?>">
+            <span>🌐</span>
             Halaman Utama
         </a>
     </nav>
 
     <!-- Footer / Logout -->
-    <div class="sv-sidebar-footer">
-        <div class="d-flex align-items-center gap-2 px-2 mb-3">
-            <div class="sv-avatar" style="width:32px;height:32px;font-size:12px;"><?= $userInitial ?></div>
-            <div style="overflow:hidden;">
-                <div style="font-size:12px;font-weight:600;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= $userName ?></div>
-                <div style="font-size:10px;color:var(--sv-sidebar-txt);opacity:.7;"><?= $userRole ?></div>
+    <div style="padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;">
+                <?= $userInitial ?>
+            </div>
+            <div style="overflow: hidden;">
+                <div style="font-size: 0.875rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white;"><?= $userName ?></div>
+                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6);"><?= $userRole ?></div>
             </div>
         </div>
-        <a href="logout.php" class="sv-logout-btn">
-            <span class="nav-icon">🚪</span>
-            Keluar
+        <a href="logout.php" class="sidebar-item" style="padding: 0.5rem; justify-content: center; border-radius: 6px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-left: none;">
+            <span>🚪</span> Keluar
         </a>
     </div>
 </div>
