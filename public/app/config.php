@@ -4,9 +4,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/Pages/helpers.php';
-
-define('API_BASE_URL', '/api');
+$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/\\');
+$basePath = preg_replace('#/app(?:/.*)?$#', '', $basePath);
+define('API_BASE_URL', $basePath . '/api');
 
 function initMockData()
 {
@@ -41,26 +41,6 @@ function initMockData()
                 'address' => 'Kost Joyogrand Kav. 5, Malang',
                 'family_phone' => '089912345678',
                 'patient_category' => 'Lainnya',
-            ],
-            [
-                'patient_id' => 'RM-2026-0004',
-                'patient_name' => 'Bpk. Hariyanto',
-                'nik_dummy' => '3578010101010004',
-                'datebirth' => '1975-06-22',
-                'gender' => 'Male',
-                'address' => 'Jl. Raya Tlogomas No. 45, Malang',
-                'family_phone' => '081998877665',
-                'patient_category' => 'Diabetes',
-            ],
-            [
-                'patient_id' => 'RM-2026-0005',
-                'patient_name' => 'Ibu Siti Rahma',
-                'nik_dummy' => '3578010101010005',
-                'datebirth' => '1952-03-14',
-                'gender' => 'Female',
-                'address' => 'Ds. Ketawanggede No. 8, Malang',
-                'family_phone' => '085677788899',
-                'patient_category' => 'Pasca Rawat',
             ],
         ];
     }
@@ -99,38 +79,6 @@ function initMockData()
                 'status' => 'Stable',
                 'user' => ['name' => 'Ns. Budi Santoso'],
             ],
-            [
-                'id' => 3,
-                'patient_id' => 'RM-2026-0004',
-                'user_id' => 1,
-                'monitoring_date' => date('Y-m-d'),
-                'monitoring_time' => '07:45:00',
-                'blood_pressure' => '145/95',
-                'body_temperature' => '36.8',
-                'heart_rate' => 92,
-                'respiratory_rate' => 22,
-                'oxygen_saturation' => 95,
-                'symptoms' => 'Gula darah tinggi, sering haus dan buang air kecil.',
-                'notes' => 'Perlu kontrol gula darah rutin dan pengaturan diet ketat.',
-                'status' => 'Need Control',
-                'user' => ['name' => 'Ns. Budi Santoso'],
-            ],
-            [
-                'id' => 4,
-                'patient_id' => 'RM-2026-0005',
-                'user_id' => 1,
-                'monitoring_date' => date('Y-m-d', strtotime('-1 day')),
-                'monitoring_time' => '14:00:00',
-                'blood_pressure' => '160/100',
-                'body_temperature' => '37.5',
-                'heart_rate' => 98,
-                'respiratory_rate' => 24,
-                'oxygen_saturation' => 92,
-                'symptoms' => 'Sesak napas ringan, badan lemas, tekanan darah tinggi.',
-                'notes' => 'Disarankan rujukan ke RS untuk penanganan lebih lanjut.',
-                'status' => 'Need Referral',
-                'user' => ['name' => 'Ns. Budi Santoso'],
-            ],
         ];
     }
 }
@@ -146,7 +94,57 @@ function handleMockAPI($method, $endpoint, $data)
         $path = substr($path, 4);
     }
 
+    if ($path === '/logout' && $method === 'POST') {
+        return [
+            'status_code' => 200,
+            'response' => [
+                'success' => true,
+                'message' => 'Logout berhasil'
+            ]
+        ];
+    }
+
+    if ($path === '/register' && $method === 'POST') {
+        $_SESSION['mock_register_email'] = $data['email'] ?? '';
+        return [
+            'status_code' => 201,
+            'response' => [
+                'success' => true,
+                'message' => 'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.',
+                'user' => [
+                    'id' => rand(100,999),
+                    'name' => $data['name'] ?? '',
+                    'email' => $data['email'] ?? '',
+                ]
+            ]
+        ];
+    }
+
+    if ($path === '/email/resend' && $method === 'POST') {
+        $_SESSION['mock_register_email'] = $data['email'] ?? '';
+        return [
+            'status_code' => 200,
+            'response' => [
+                'success' => true,
+                'message' => 'Email verifikasi telah dikirim ulang. Silakan cek email Anda.'
+            ]
+        ];
+    }
+
     if ($path === '/login' && $method === 'POST') {
+        $email = $data['email'] ?? '';
+        $registeredEmail = $_SESSION['mock_register_email'] ?? '';
+
+        if (!empty($registeredEmail) && $email !== $registeredEmail) {
+            return [
+                'status_code' => 403,
+                'response' => [
+                    'success' => false,
+                    'verified' => false,
+                    'message' => 'Email belum diverifikasi. Silakan verifikasi email Anda terlebih dahulu.'
+                ]
+            ];
+        }
         return [
             'status_code' => 200,
             'response' => [
@@ -155,7 +153,7 @@ function handleMockAPI($method, $endpoint, $data)
                 'user' => [
                     'id' => 1,
                     'name' => 'Ns. Budi Santoso',
-                    'email' => $data['email'] ?? 'budi@carevisit.dev',
+                    'email' => $email,
                     'role' => 'Petugas Kesehatan'
                 ]
             ]

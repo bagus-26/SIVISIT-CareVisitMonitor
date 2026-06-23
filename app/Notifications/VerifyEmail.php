@@ -30,9 +30,9 @@ class VerifyEmail extends Notification implements ShouldQueue
         );
 
         return (new \Illuminate\Notifications\Messages\MailMessage)
-            ->subject('Verifikasi Email - SIVISIT CareVisit Monitor')
+            ->subject('Verifikasi Email - SIVISIT-CareVisitMonitor')
             ->greeting('Halo ' . $notifiable->name . '!')
-            ->line('Terima kasih telah mendaftar di SIVISIT CareVisit Monitor.')
+            ->line('Terima kasih telah mendaftar di SIVISIT-CareVisitMonitor.')
             ->line('Silakan klik tombol di bawah ini untuk memverifikasi alamat email Anda.')
             ->action('Verifikasi Email', $verificationUrl)
             ->line('Jika Anda tidak mendaftar di aplikasi ini, abaikan email ini.')

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'SIVISIT') — CareVisit Monitor</title>
+    <title>@yield('title', 'SIVISIT') — SIVISIT-CareVisitMonitor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
                 </div>
                 <div class="sv-sidebar-brand-name">
                     <strong>SIVISIT</strong>
-                    <span>CareVisit Monitor</span>
+                    <span>SIVISIT-CareVisitMonitor</span>
                 </div>
                 {{-- close button on mobile --}}
                 <button class="sv-sidebar-close d-lg-none" onclick="closeSidebar()" aria-label="Tutup menu">
@@ -124,7 +124,7 @@
 
             {{-- Footer --}}
             <footer class="sv-footer">
-                <span>© 2026 SIVISIT — CareVisit Monitor. Informatika Kesehatan.</span>
+                <span>© 2026 SIVISIT-CareVisitMonitor. Informatika Kesehatan.</span>
                 <span style="font-style:italic;color:#8E8E93;">Data bersifat simulasi/dummy. Bukan diagnosis medis.</span>
             </footer>
         </div>

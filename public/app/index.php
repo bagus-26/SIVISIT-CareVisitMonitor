@@ -7,7 +7,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIVISIT — CareVisit Monitor</title>
+    <title>SIVISIT-CareVisitMonitor</title>
     <meta name="description" content="Sistem monitoring pasien home care terpadu.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="Pages/globals.css" rel="stylesheet">
@@ -212,6 +212,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <a href="Pages/about.php">Tentang</a>
         <a href="Pages/jadwal.php">Cek Jadwal</a>
         <a href="#kontak">Kontak</a>
+        <a href="Pages/register.php">Daftar</a>
         <a href="Pages/login.php" class="btn-login">Masuk Admin</a>
     </div>
 </nav>
@@ -221,6 +222,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <a href="Pages/about.php">Tentang Kami</a>
     <a href="Pages/jadwal.php">Cek Jadwal</a>
     <a href="#kontak">Kontak</a>
+    <a href="Pages/register.php">Daftar</a>
     <a href="Pages/login.php">Masuk Admin</a>
 </div>
 
@@ -252,7 +254,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 </div>
 
 <footer class="footer" id="kontak">
-    <div> 2026 SIVISIT — CareVisit Monitor. Data bersifat simulasi.</div>
+    <div> © 2026 SIVISIT-CareVisitMonitor. Data bersifat simulasi.</div>
 </footer>
 
 <script>

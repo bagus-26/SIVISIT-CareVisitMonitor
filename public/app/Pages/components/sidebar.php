@@ -21,7 +21,7 @@ $navItems = [
         </button>
         <div class="sv-sidebar-brand-name">
             <strong>SIVISIT</strong>
-            <span>CareVisit Monitor</span>
+            <span>SIVISIT-CareVisitMonitor</span>
         </div>
     </div>
 

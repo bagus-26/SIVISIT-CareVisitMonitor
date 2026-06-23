@@ -2,9 +2,26 @@
     RewriteEngine On
 
     # Redirect all requests to the public directory
-    # This allows Laravel to work without /public in the URL
-    RewriteCond %{REQUEST_URI} !^/public/
-    RewriteRule ^(.*)$ /public/$1 [L,QSA]
+    RewriteCond %{REQUEST_URI} !public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
 
     RewriteRule ^ index.php [L]
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "\.(env|git|md|log|lock|bat|sh)$">
+    Require all denied
+</FilesMatch>
+
+# Protect hidden files (starting with dot)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Block access to sensitive directories
+<IfModule mod_rewrite.c>
+    RewriteRule ^(vendor|storage|bootstrap|cache|config|database|resources|routes|tests)(/.*)?$ - [F,L,NC]
 </IfModule>

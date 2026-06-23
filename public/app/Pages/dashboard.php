@@ -200,7 +200,7 @@ function getStatusBadge($status) {
         </div>
 
         <footer style="padding:16px 24px;border-top:1px solid var(--sv-border);text-align:center;color:var(--sv-text-muted);font-size:13px;background:var(--sv-surface);">
-            © 2026 SIVISIT CareVisit Monitor. Seluruh data bersifat simulasi.
+            © 2026 SIVISIT-CareVisitMonitor. Seluruh data bersifat simulasi.
         </footer>
     </div>
 </div>

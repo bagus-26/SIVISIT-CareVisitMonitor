@@ -450,7 +450,7 @@ $activeTab = $_GET['tab'] ?? 'tentang';
             <div class="row g-4">
                 <div class="col-lg-6">
                     <div class="sv-content-card">
-                        <h2>Tentang MediaAdmin CareVisit Monitor</h2>
+                        <h2>Tentang MediaAdmin SIVISIT-CareVisitMonitor</h2>
                         <p style="font-size: 14.5px; color: var(--sv-text-sub); line-height: 1.7; margin-bottom: 30px;">
                             Mengenal sistem monitoring terpadu yang menjembatani transparansi pelaporan administratif antara petugas lapangan, institusi kesehatan, dan keluarga pasien.
                         </p>
@@ -483,7 +483,7 @@ $activeTab = $_GET['tab'] ?? 'tentang';
                 <div class="col-lg-6">
                     <div class="sv-content-card d-flex flex-column justify-content-between">
                         <div>
-                            <h2>Alur Sistem CareVisit Monitor</h2>
+                            <h2>Alur Sistem SIVISIT-CareVisitMonitor</h2>
                             <p style="font-size: 14.5px; color: var(--sv-text-sub); line-height: 1.7; margin-bottom: 30px;">
                                 Tiga fase terintegrasi yang menjamin akurasi dan kemudahan penyampaian hasil rekapitulasi data home care.
                             </p>
@@ -533,7 +533,7 @@ $activeTab = $_GET['tab'] ?? 'tentang';
             <div class="row g-4">
                 <div class="col-lg-6">
                     <div class="sv-content-card">
-                        <h2>Panduan Pengguna Sistem CareVisit Monitor</h2>
+                        <h2>Panduan Pengguna Sistem SIVISIT-CareVisitMonitor</h2>
                         <p style="font-size: 14.5px; color: var(--sv-text-sub); line-height: 1.7; margin-bottom: 30px;">
                             Pelajari langkah operasional penggunaan platform pelaporan administratif untuk memastikan transparansi pemantauan pasien antara petugas lapangan dan keluarga.
                         </p>

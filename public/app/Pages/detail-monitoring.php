@@ -27,10 +27,7 @@ foreach ($allMonitorings as $m) {
 if (!$monitoring && $patientId) {
     $filtered = array_filter($allMonitorings, fn($m) => ($m['patient_id'] ?? '') === $patientId);
     if (!empty($filtered)) {
-        usort($filtered, fn($a, $b) =>
-            strtotime(($b['monitoring_date'] ?? '') . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=>
-            strtotime(($a['monitoring_date'] ?? '') . ' ' . ($a['monitoring_time'] ?? '00:00:00'))
-        );
+        usort($filtered, fn($a, $b) => strtotime($b['monitoring_date'] ?? '') <=> strtotime($a['monitoring_date'] ?? ''));
         $monitoring = array_values($filtered)[0];
     }
 }
@@ -406,27 +403,9 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
                                 </div>
                                 <div class="col-md-6">
                                     <div class="info-pair">
-                                        <span class="label">Catatan Petugas</span>
-                                        <p class="value mt-1" style="line-height:1.7;color:var(--sv-text-sub);">
-                                            <?= nl2br(htmlspecialchars($monitoring['notes'] ?? 'Tidak ada catatan.')) ?>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row g-3 mt-2">
-                                <div class="col-md-6">
-                                    <div class="info-pair">
                                         <span class="label">Rekomendasi Tindak Lanjut</span>
                                         <p class="value mt-1" style="line-height:1.7;color:var(--sv-text-sub);">
-                                            <?= nl2br(htmlspecialchars($monitoring['recommendation'] ?? 'Tidak ada rekomendasi.')) ?>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-pair">
-                                        <span class="label">Kunjungan Berikutnya</span>
-                                        <p class="value mt-1" style="line-height:1.7;color:var(--sv-text-sub);">
-                                            <?= !empty($monitoring['next_visit_date']) ? date('d M Y', strtotime($monitoring['next_visit_date'])) : 'Belum dijadwalkan' ?>
+                                            <?= nl2br(htmlspecialchars($monitoring['notes'] ?? 'Tidak ada catatan rekomendasi.')) ?>
                                         </p>
                                     </div>
                                 </div>

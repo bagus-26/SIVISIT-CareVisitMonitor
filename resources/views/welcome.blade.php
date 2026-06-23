@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIVISIT — CareVisit Monitor | Sistem Monitoring Kesehatan Home Care</title>
-    <meta name="description" content="SIVISIT CareVisit Monitor adalah sistem digital pemantauan kondisi kesehatan pasien home care secara real-time. Monitoring tanda vital, rekam medis, dan laporan kunjungan petugas.">
+    <title>SIVISIT-CareVisitMonitor | Sistem Monitoring Kesehatan Home Care</title>
+    <meta name="description" content="SIVISIT-CareVisitMonitor adalah sistem digital pemantauan kondisi kesehatan pasien home care secara real-time. Monitoring tanda vital, rekam medis, dan laporan kunjungan petugas.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="{{ asset('css/landing.css') }}" rel="stylesheet">
@@ -19,7 +19,7 @@
                 <div class="lp-brand-icon">🏥</div>
                 <div>
                     <div class="lp-brand-name">SIVISIT</div>
-                    <div class="lp-brand-sub">CareVisit Monitor</div>
+                    <div class="lp-brand-sub">SIVISIT-CareVisitMonitor</div>
                 </div>
             </a>
             <div class="lp-nav-links">
@@ -264,7 +264,7 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
                 <div class="lp-chip">ℹ️ Tentang Sistem</div>
-                <h2 class="lp-section-title mt-3">SIVISIT CareVisit Monitor</h2>
+                <h2 class="lp-section-title mt-3">SIVISIT-CareVisitMonitor</h2>
                 <p class="lp-section-desc text-start">
                     Sistem ini dikembangkan sebagai platform digital untuk membantu petugas kesehatan 
                     dalam mencatat dan memantau kondisi pasien yang menjalani perawatan di rumah (<em>home care</em>).
@@ -347,7 +347,7 @@
                 <div class="d-flex align-items-center gap-2 mb-1">
                     <div class="lp-brand-icon" style="width:28px;height:28px;font-size:14px;">🏥</div>
                     <strong style="font-size:14px;color:white;">SIVISIT</strong>
-                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">CareVisit Monitor</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,0.4);">SIVISIT-CareVisitMonitor</span>
                 </div>
                 <div style="font-size:12px;color:rgba(255,255,255,0.4);">© 2026 SIVISIT — Informatika Kesehatan. Hak cipta dilindungi.</div>
             </div>
