@@ -12,10 +12,9 @@ $monitorings    = ($monitoringsRes['status_code'] === 200 && isset($monitoringsR
     ? $monitoringsRes['response']['data']
     : [];
 
-// Sort by date desc (include time to preserve same-day ordering)
+// Sort by date desc
 usort($monitorings, fn($a,$b) =>
-    strtotime(($b['monitoring_date'] ?? '') . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=>
-    strtotime(($a['monitoring_date'] ?? '') . ' ' . ($a['monitoring_time'] ?? '00:00:00'))
+    strtotime($b['monitoring_date'] ?? '') <=> strtotime($a['monitoring_date'] ?? '')
 );
 
 // Count by status
@@ -32,6 +31,14 @@ $userName    = htmlspecialchars($user['name']  ?? 'Petugas');
 $userInitial = strtoupper(substr($user['name'] ?? 'P', 0, 1));
 $userEmail   = htmlspecialchars($user['email'] ?? '');
 
+function getStatusBadge($status) {
+    $s = strtolower($status ?? '');
+    if (str_contains($s,'stable') || str_contains($s,'stabil'))
+        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
+    if (str_contains($s,'referral') || str_contains($s,'rujukan'))
+        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
+    return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -41,8 +48,7 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
     <title>Data Monitoring — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
-    <link href="../pages/global.css" rel="stylesheet">
-    <link href="../pages/table.css" rel="stylesheet">
+    <link href="table.css" rel="stylesheet">
     <style>
         .filter-tabs {
             display: flex;

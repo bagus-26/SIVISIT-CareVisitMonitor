@@ -37,6 +37,17 @@ if (!empty($query)) {
     }
 }
 
+function getStatusBadge($status) {
+    $s = strtolower($status ?? '');
+    if (str_contains($s, 'stable') || str_contains($s, 'stabil')) {
+        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
+    }
+    if (str_contains($s, 'referral') || str_contains($s, 'rujukan')) {
+        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
+    }
+    return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
+}
+
 function calculateAge($dob) {
     if (empty($dob)) return '-';
     try {
@@ -53,8 +64,8 @@ function calculateAge($dob) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jadwal & Pencarian Pasien — MediaAdmin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../pages/global.css" rel="stylesheet">
-    <link href="../pages/table.css" rel="stylesheet">
+    <link href="globals.css" rel="stylesheet">
+    <link href="table.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
