@@ -1,0 +1,97 @@
+@startuml
+!define primarykey(x) <b><color:#000000><&key> x</color></b>
+!define foreignkey(x) <color:#0000FF><&key> x</color::blue>
+
+skinparam rectangle {
+    BackgroundColor #f5f5f5
+    BorderColor #333333
+    FontStyle bold
+    FontSize 14
+}
+
+skinparam entity {
+    BackgroundColor #E8F4FD
+    BorderColor #2B6CB0
+    FontSize 13
+}
+
+left to right direction
+
+' ===== CHEN NOTATION: ENTITIES =====
+entity "Users\n(Pengguna)" as users {
+    + user_id: BIGINT (PK)
+    --
+    name: VARCHAR
+    email: VARCHAR (UNIQUE)
+    password: VARCHAR
+    role: VARCHAR
+    nip: VARCHAR (nullable)
+    phone: VARCHAR (nullable)
+    location: VARCHAR (nullable)
+    timestamps
+}
+
+entity "Patients\n(Pasien)" as patients {
+    + patient_id: VARCHAR (PK)
+    --
+    patient_name: VARCHAR
+    nik_dummy: VARCHAR (nullable)
+    datebirth: DATE
+    gender: ENUM(Male/Female)
+    address: TEXT
+    family_phone: VARCHAR
+    patient_category: VARCHAR
+    timestamps
+}
+
+entity "Monitorings\n(Pemantauan)" as monitorings {
+    + monitoring_id: BIGINT (PK)
+    --
+    # patient_id: VARCHAR (FK)
+    # user_id: BIGINT (FK)
+    monitoring_date: DATE
+    blood_pressure: VARCHAR (nullable)
+    heart_rate: VARCHAR (nullable)
+    respiratory_rate: VARCHAR (nullable)
+    body_temperature: VARCHAR (nullable)
+    oxygen_saturation: VARCHAR (nullable)
+    symptoms: TEXT (nullable)
+    notes: TEXT (nullable)
+    status: ENUM
+    monitoring_time: TIME (nullable)
+    examination_focus: VARCHAR (nullable)
+    timestamps
+}
+
+entity "Usage_Logs\n(Log Aktivitas)" as usage_logs {
+    + log_id: BIGINT (PK)
+    --
+    # user_id: BIGINT (FK, nullable)
+    user_name: VARCHAR (nullable)
+    action: VARCHAR
+    module: VARCHAR
+    description: TEXT (nullable)
+    ip_address: VARCHAR (nullable)
+    user_agent: TEXT (nullable)
+    timestamps
+}
+
+entity "AI_Usage_Logs\n(Log Penggunaan AI)" as ai_usage_logs {
+    + ai_log_id: BIGINT (PK)
+    --
+    tanggal: DATE
+    nama_anggota: VARCHAR
+    tools_ai: VARCHAR
+    prompt_penting: TEXT
+    hasil_dari_ai: TEXT
+    verifikasi_revisi_tim: TEXT
+    timestamps
+}
+
+' ===== RELATIONSHIPS =====
+users ||--o{ monitorings : "melakukan"
+users ||--o{ usage_logs : "mencatat"
+
+patients ||--o{ monitorings : "memiliki"
+
+@enduml

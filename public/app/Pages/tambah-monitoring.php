@@ -47,6 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'oxygen_saturation'=> (float)($_POST['oxygen_saturation'] ?? 0),
             'symptoms'         => trim($_POST['symptoms']    ?? ''),
             'notes'            => trim($_POST['notes']       ?? ''),
+            'recommendation'   => trim($_POST['recommendation'] ?? ''),
+            'next_visit_date'  => $_POST['next_visit_date'] ?? '',
             'status'           => $_POST['status']           ?? '',
         ];
 
@@ -81,6 +83,7 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
     <title>Catat Monitoring — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="../pages/global.css" rel="stylesheet">
     <style>
         .form-section {
             background: white;
@@ -331,12 +334,24 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
                                             required><?= htmlspecialchars($_POST['symptoms'] ?? '') ?></textarea>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="notes" class="form-label">Rekomendasi Tindak Lanjut</label>
+                                        <label for="notes" class="form-label">Catatan Petugas</label>
                                         <textarea name="notes" id="notes" class="form-control" rows="3"
-                                            placeholder="Contoh: Jadwalkan kontrol ulang dalam 3 hari, anjurkan diet rendah garam..."><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
-                                        <div class="validation-hint">
-                                            ⚠️ Rekomendasi hanya berupa tindak lanjut administratif, bukan nasihat medis spesifik.
-                                        </div>
+                                            placeholder="Catatan tambahan petugas..."><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-6">
+                                        <label for="recommendation" class="form-label">Rekomendasi Tindak Lanjut</label>
+                                        <textarea name="recommendation" id="recommendation" class="form-control" rows="2"
+                                            placeholder="Contoh: Jadwalkan kontrol ulang dalam 3 hari..."><?= htmlspecialchars($_POST['recommendation'] ?? '') ?></textarea>
+                                        <div class="validation-hint">⚠️ Rekomendasi bersifat administratif, bukan nasihat medis.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="next_visit_date" class="form-label">Tanggal Kunjungan Berikutnya</label>
+                                        <input type="date" name="next_visit_date" id="next_visit_date" class="form-control"
+                                            value="<?= htmlspecialchars($_POST['next_visit_date'] ?? '') ?>"
+                                            min="<?= date('Y-m-d') ?>">
+                                        <div class="validation-hint">Jadwalkan kunjungan lanjutan jika diperlukan</div>
                                     </div>
                                 </div>
                             </div>

@@ -16,18 +16,6 @@ function calculateAge($dob) {
     return $today->diff($birthDate)->y . ' Thn';
 }
 
-function getStatusBadge($status) {
-    $s = strtolower($status ?? '');
-    if (str_contains($s, 'stable') || str_contains($s, 'stabil')) {
-        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
-    } elseif (str_contains($s, 'referral') || str_contains($s, 'rujukan')) {
-        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
-    } elseif (str_contains($s, 'control') || str_contains($s, 'kontrol')) {
-        return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
-    }
-    return '<span class="sv-badge" style="background:#F2F4F7;color:#636366;">–</span>';
-}
-
 function getCategoryBadge($cat) {
     $badges = [
         'lansia'      => ['#FFF4E5','#8A4E00','🧓'],
@@ -58,6 +46,9 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
     <title>Daftar Pasien — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="../pages/global.css" rel="stylesheet">
+    <link href="../pages/table.css" rel="stylesheet">
+    <link href="../pages/modal.css" rel="stylesheet">
     <style>
         .patient-avatar {
             width: 38px; height: 38px;
@@ -222,7 +213,10 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
                                     $latestStatus = '';
                                     if (!empty($p['monitorings'])) {
                                         $mons = $p['monitorings'];
-                                        usort($mons, fn($a,$b) => strtotime($b['monitoring_date'] ?? '') <=> strtotime($a['monitoring_date'] ?? ''));
+                                        usort($mons, fn($a,$b) =>
+                                            strtotime(($b['monitoring_date'] ?? '') . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=>
+                                            strtotime(($a['monitoring_date'] ?? '') . ' ' . ($a['monitoring_time'] ?? '00:00:00'))
+                                        );
                                         $latestStatus = $mons[0]['status'] ?? '';
                                     }
                                     $gender = ($p['gender'] ?? '') === 'Male' ? '👨' : '👩';

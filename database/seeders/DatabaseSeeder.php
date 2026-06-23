@@ -79,6 +79,28 @@ class DatabaseSeeder extends Seeder
             'patient_category' => 'Lansia',
         ]);
 
+        $p5 = Patient::create([
+            'patient_id' => 'P005',
+            'patient_name' => 'Bpk. Hariyanto',
+            'nik_dummy' => '3578123456789012',
+            'datebirth' => '1975-06-22',
+            'address' => 'Jl. Raya Tlogomas No. 45, Malang',
+            'family_phone' => '081998877665',
+            'gender' => 'Male',
+            'patient_category' => 'Diabetes',
+        ]);
+
+        $p6 = Patient::create([
+            'patient_id' => 'P006',
+            'patient_name' => 'Ibu Siti Rahma',
+            'nik_dummy' => '3578654321098765',
+            'datebirth' => '1952-03-14',
+            'address' => 'Ds. Ketawanggede No. 8, Malang',
+            'family_phone' => '085677788899',
+            'gender' => 'Female',
+            'patient_category' => 'Pasca Rawat',
+        ]);
+
         // Add some monitoring records for today
         Monitoring::create([
             'patient_id' => 'P003',
@@ -108,6 +130,36 @@ class DatabaseSeeder extends Seeder
             'symptoms' => 'Diabetes Melitus',
             'notes' => 'Gula darah acak normal, perlu pemantauan diet.',
             'status' => 'Stable',
+        ]);
+
+        Monitoring::create([
+            'patient_id' => 'P005',
+            'user_id' => $testUser->id,
+            'monitoring_date' => date('Y-m-d'),
+            'monitoring_time' => '07:45:00',
+            'blood_pressure' => '145/95',
+            'heart_rate' => 92,
+            'respiratory_rate' => 22,
+            'body_temperature' => '36.8',
+            'oxygen_saturation' => 95,
+            'symptoms' => 'Gula darah tinggi, sering haus dan buang air kecil.',
+            'notes' => 'Perlu kontrol gula darah rutin dan pengaturan diet ketat.',
+            'status' => 'Need Control',
+        ]);
+
+        Monitoring::create([
+            'patient_id' => 'P006',
+            'user_id' => $testUser->id,
+            'monitoring_date' => date('Y-m-d', strtotime('-1 day')),
+            'monitoring_time' => '14:00:00',
+            'blood_pressure' => '160/100',
+            'heart_rate' => 98,
+            'respiratory_rate' => 24,
+            'body_temperature' => '37.5',
+            'oxygen_saturation' => 92,
+            'symptoms' => 'Sesak napas ringan, badan lemas, tekanan darah tinggi.',
+            'notes' => 'Disarankan rujukan ke RS untuk penanganan lebih lanjut.',
+            'status' => 'Need Referral',
         ]);
     }
 }

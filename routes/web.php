@@ -9,8 +9,12 @@ use App\Http\Controllers\Admin\RekamMedisController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SearchController;
 
+
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (auth()->check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return view('welcome');
 })->name('home');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -19,7 +23,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-    
+
     // Patient Routes
     Route::get('/admin/patients', [PatientController::class, 'index'])->name('admin.patients.index');
     Route::get('/admin/patients/create', [PatientController::class, 'create'])->name('admin.patients.create');
@@ -41,5 +45,7 @@ Route::middleware('auth')->group(function () {
     // Profile Routes
     Route::get('/admin/profil', [ProfileController::class, 'index'])->name('admin.profil');
     Route::put('/admin/profil', [ProfileController::class, 'update'])->name('admin.profil.update');
+
 });
+
 

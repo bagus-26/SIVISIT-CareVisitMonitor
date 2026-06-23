@@ -173,14 +173,46 @@
                     <p style="font-size:13.5px;color:var(--sv-text-sub);line-height:1.7;">{{ $monitoring->symptoms ?? 'Tidak ada catatan.' }}</p>
                 </div>
                 <div class="col-md-6">
-                    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--sv-text-muted);margin-bottom:8px;">Rekomendasi Tindak Lanjut</div>
+                    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--sv-text-muted);margin-bottom:8px;">Catatan Petugas</div>
                     <p style="font-size:13.5px;color:var(--sv-text-sub);line-height:1.7;">{{ $monitoring->notes ?? 'Tidak ada catatan.' }}</p>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--sv-text-muted);margin-bottom:8px;">Rekomendasi Tindak Lanjut</div>
+                    <p style="font-size:13.5px;color:var(--sv-text-sub);line-height:1.7;">{{ $monitoring->recommendation ?? 'Tidak ada rekomendasi.' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--sv-text-muted);margin-bottom:8px;">Kunjungan Berikutnya</div>
+                    <p style="font-size:13.5px;color:var(--sv-text-sub);line-height:1.7;">
+                        {{ $monitoring->next_visit_date ? \Carbon\Carbon::parse($monitoring->next_visit_date)->format('d M Y') : 'Belum dijadwalkan' }}
+                    </p>
                 </div>
             </div>
             <div class="mt-3 p-3 rounded" style="background:#F8F9FA;font-size:12px;color:#8E8E93;line-height:1.6;">
                 ⚠️ <strong>Disclaimer:</strong> Rekomendasi bersifat administratif dan bukan diagnosis medis. Data ini adalah simulasi akademik.
             </div>
         </div>
+
+        {{-- Leaflet Map --}}
+        @if($monitoring->patient->address ?? false)
+        <div class="sv-card sv-animate-in mt-3" id="mapCard">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <div style="width:32px;height:32px;border-radius:8px;background:var(--sv-blue-light);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--sv-blue);">
+                    <i class="bi bi-geo-alt-fill"></i>
+                </div>
+                <div>
+                    <h6 style="font-size:13px;font-weight:700;margin:0;color:var(--sv-text-main);">Lokasi Kunjungan</h6>
+                    <div style="font-size:11.5px;color:var(--sv-text-muted);">{{ $monitoring->patient->address }}</div>
+                </div>
+            </div>
+            <div id="leafletMap" style="height:280px;border-radius:10px;overflow:hidden;border:1px solid var(--sv-border);background:#E8F1FF;"></div>
+            <div id="mapMsg" style="display:none;text-align:center;padding:20px;font-size:12.5px;color:var(--sv-text-muted);">
+                <i class="bi bi-geo-alt" style="font-size:24px;display:block;margin-bottom:6px;opacity:.4;"></i>
+                Koordinat tidak tersedia untuk alamat ini.
+            </div>
+        </div>
+        @endif
     </div>
 
     {{-- Riwayat Kunjungan Sidebar --}}
@@ -230,4 +262,68 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('head')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+@endsection
+
+@section('scripts')
+@if($monitoring->patient->address ?? false)
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
+<script>
+(function() {
+    var address = @json($monitoring->patient->address ?? '');
+    if (!address) return;
+
+    var mapEl  = document.getElementById('leafletMap');
+    var msgEl  = document.getElementById('mapMsg');
+
+    // Geocode via Nominatim (OpenStreetMap, free)
+    var query  = encodeURIComponent(address + ', Indonesia');
+    var url    = 'https://nominatim.openstreetmap.org/search?format=json&q=' + query + '&limit=1';
+
+    fetch(url, { headers: { 'Accept-Language': 'id' } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || !data.length) {
+                mapEl.style.display = 'none';
+                msgEl.style.display = 'block';
+                return;
+            }
+            var lat = parseFloat(data[0].lat);
+            var lon = parseFloat(data[0].lon);
+
+            var map = L.map('leafletMap', { zoomControl: true, attributionControl: true });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+            }).addTo(map);
+
+            var icon = L.divIcon({
+                html: '<div style="width:32px;height:32px;background:#007AFF;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 3px 10px rgba(0,122,255,0.4);"></div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                className: ''
+            });
+
+            L.marker([lat, lon], { icon: icon })
+                .addTo(map)
+                .bindPopup(
+                    '<strong style="font-size:13px;">{{ $monitoring->patient->patient_name ?? "Pasien" }}</strong>' +
+                    '<br><span style="font-size:11.5px;color:#636366;">' + address + '</span>',
+                    { maxWidth: 220 }
+                )
+                .openPopup();
+
+            map.setView([lat, lon], 15);
+        })
+        .catch(function() {
+            mapEl.style.display = 'none';
+            msgEl.style.display = 'block';
+        });
+})();
+</script>
+@endif
 @endsection

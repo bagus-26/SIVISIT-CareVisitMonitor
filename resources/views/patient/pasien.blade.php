@@ -7,18 +7,20 @@
         <h1>Daftar Pasien Binaan</h1>
         <p>Kelola data pasien binaan home care SIVISIT.</p>
     </div>
-    <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">➕ Tambah Pasien Baru</a>
+    <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">
+        <i class="bi bi-person-plus me-1"></i> Tambah Pasien Baru
+    </a>
 </div>
 
 @if(session('success'))
 <div class="alert alert-success d-flex align-items-center gap-2 mb-4 sv-animate-in" role="alert">
-    <span>✅</span><span>{{ session('success') }}</span>
+    <i class="bi bi-check-circle-fill"></i><span>{{ session('success') }}</span>
 </div>
 @endif
 
 <div class="sv-table-wrap sv-animate-in">
     <div class="sv-section-header">
-        <h5>👥 Data Pasien Binaan</h5>
+        <h5><i class="bi bi-people me-2" style="color:var(--sv-blue);"></i>Data Pasien Binaan</h5>
         <span style="font-size:12px;color:#8E8E93;">{{ $patients->count() }} pasien terdaftar</span>
     </div>
     <div class="table-responsive">
@@ -69,7 +71,7 @@
                     <tr>
                         <td colspan="7">
                             <div class="sv-empty-state">
-                                <div class="empty-icon">👥</div>
+                                <i class="bi bi-people" style="font-size:40px;color:#D1D5DB;"></i>
                                 <p>Belum ada data pasien terdaftar. <a href="{{ route('admin.patients.create') }}">Tambah pasien pertama →</a></p>
                             </div>
                         </td>
@@ -86,7 +88,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content" style="border-radius:16px;border:none;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
                 <div class="modal-header" style="background:linear-gradient(135deg,var(--sv-navy),var(--sv-navy-mid));color:white;padding:20px 24px;border-radius:16px 16px 0 0;">
-                    <h5 class="modal-title" id="viewModalLabel{{ $p->patient_id }}">🏥 Detail Pasien: {{ $p->patient_name ?? '' }}</h5>
+                    <h5 class="modal-title" id="viewModalLabel{{ $p->patient_id }}">Detail Pasien: {{ $p->patient_name ?? '' }}</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="padding:24px;">
@@ -109,17 +111,17 @@
                         </div>
                         <div class="col-md-6">
                             <span class="text-muted small d-block">Alamat Lengkap</span>
-                            <strong>📍 {{ $p->address ?? '-' }}</strong>
+                            <strong><i class="bi bi-geo-alt me-1"></i>{{ $p->address ?? '-' }}</strong>
                         </div>
                         <div class="col-md-6">
                             <span class="text-muted small d-block">Nomor Telepon Darurat</span>
-                            <strong>📞 {{ $p->family_phone ?? '-' }}</strong>
+                            <strong><i class="bi bi-telephone me-1"></i>{{ $p->family_phone ?? '-' }}</strong>
                         </div>
                     </div>
 
                     <hr style="border-color:#F0F2F5;">
 
-                    <h6 class="fw-bold text-primary mb-3">🩺 Riwayat Monitoring Kesehatan</h6>
+                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-clipboard2-pulse me-2"></i>Riwayat Monitoring Kesehatan</h6>
                     @if($p->monitorings->isEmpty())
                         <div class="alert alert-light text-muted small mb-0">Belum ada catatan monitoring kesehatan untuk pasien ini.</div>
                     @else
@@ -168,7 +170,9 @@
                 </div>
                 <div class="modal-footer" style="border-top:1px solid #F0F2F5;padding:16px 24px;border-radius:0 0 16px 16px;">
                     <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
-                    <a href="{{ route('admin.monitorings.create', ['patient_id' => $p->patient_id]) }}" class="btn btn-primary btn-sm">🩺 Tambah Monitoring</a>
+                    <a href="{{ route('admin.monitorings.create', ['patient_id' => $p->patient_id]) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil-square me-1"></i> Tambah Monitoring
+                    </a>
                 </div>
             </div>
         </div>

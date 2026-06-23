@@ -3,75 +3,151 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\monitoring;
+use App\Models\Monitoring;
 use Illuminate\Http\Request;
 
 class MonitoringController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /api/monitorings — semua data monitoring + relasi pasien & user
      */
-    public function index()
+    public function index(Request $request)
     {
-        $monitorings = \App\Models\Monitoring::with('patient')->get();
+        $query = Monitoring::with([
+            'patient',
+            'user' => fn($q) => $q->select('id', 'name', 'email'),
+        ])->latest('monitoring_date')->latest('monitoring_time');
+
+        // Filter by patient_id
+        if ($pid = $request->query('patient_id')) {
+            $query->where('patient_id', $pid);
+        }
+
+        // Filter by date
+        if ($date = $request->query('date')) {
+            $query->whereDate('monitoring_date', $date);
+        }
+
+        $monitorings = $query->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Monitoring list retrieved successfully.',
-            'data' => $monitorings
+            'message' => 'Data monitoring berhasil diambil.',
+            'data'    => $monitorings,
         ], 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/monitorings — simpan monitoring baru
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'patient_id' => 'required|exists:patients,patient_id',
-            'user_id' => 'required|exists:users,id',
-            'monitoring_date' => 'required|date',
-            'blood_pressure' => 'nullable|string',
-            'heart_rate' => 'nullable|integer',
-            'respiratory_rate' => 'nullable|integer',
-            'body_temperature' => 'nullable|numeric',
-            'oxygen_saturation' => 'nullable|integer',
-            'symptoms' => 'nullable|string',
-            'notes' => 'nullable|string',
-            'status' => 'required|in:Stable,Need Control,Need Referral',
-
+        $validated = $request->validate([
+            'patient_id'        => 'required|exists:patients,patient_id',
+            'user_id'           => 'required|exists:users,id',
+            'monitoring_date'   => 'required|date',
+            'monitoring_time'   => 'nullable|string',
+            'blood_pressure'    => ['required', 'regex:/^\d{2,3}\/\d{2,3}$/', function ($attr, $value, $fail) {
+                $parts = explode('/', $value);
+                $systolic = (int) $parts[0];
+                $diastolic = (int) $parts[1];
+                if ($systolic < 60 || $systolic > 250) $fail('Tekanan sistolik harus antara 60-250 mmHg.');
+                if ($diastolic < 40 || $diastolic > 150) $fail('Tekanan diastolik harus antara 40-150 mmHg.');
+            }],
+            'heart_rate'        => 'nullable|integer|min:30|max:250',
+            'respiratory_rate'  => 'nullable|integer|min:5|max:60',
+            'body_temperature'  => 'required|numeric|between:35,42',
+            'oxygen_saturation' => 'nullable|numeric|min:50|max:100',
+            'symptoms'          => 'required|string',
+            'notes'             => 'nullable|string',
+            'recommendation'    => 'nullable|string',
+            'next_visit_date'   => 'nullable|date',
+            'status'            => 'required|in:Stable,Need Control,Need Referral',
         ]);
 
-        $monitoring = Monitoring::create($validatedData);
+        $monitoring = Monitoring::create($validated);
+
+        // Load relasi untuk response
+        $monitoring->load(['patient', 'user' => fn($q) => $q->select('id', 'name', 'email')]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Monitoring record created successfully.',
-            'data' => $monitoring
+            'message' => 'Monitoring berhasil disimpan.',
+            'data'    => $monitoring,
         ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * GET /api/monitorings/{id} — detail satu monitoring
      */
     public function show(string $id)
     {
-        //
+        $monitoring = Monitoring::with([
+            'patient',
+            'user' => fn($q) => $q->select('id', 'name', 'email'),
+        ])->find($id);
+
+        if (!$monitoring) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data monitoring tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail monitoring berhasil diambil.',
+            'data'    => $monitoring,
+        ], 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * GET /api/monitoring/status/{status} — filter monitoring by status
      */
-    public function update(Request $request, string $id)
+    public function byStatus(string $status)
     {
-        //
+        $allowed = ['Stable', 'Need Control', 'Need Referral'];
+        if (!in_array($status, $allowed)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Status tidak valid. Pilihan: ' . implode(', ', $allowed),
+            ], 422);
+        }
+
+        $monitorings = Monitoring::with([
+            'patient',
+            'user' => fn($q) => $q->select('id', 'name', 'email'),
+        ])->where('status', $status)
+          ->latest('monitoring_date')
+          ->latest('monitoring_time')
+          ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Data monitoring dengan status '$status' berhasil diambil.",
+            'data'    => $monitorings,
+        ], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * DELETE /api/monitorings/{id} — hapus monitoring
      */
     public function destroy(string $id)
     {
-        //
+        $monitoring = Monitoring::find($id);
+
+        if (!$monitoring) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data monitoring tidak ditemukan.',
+            ], 404);
+        }
+
+        $monitoring->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data monitoring berhasil dihapus.',
+        ], 200);
     }
 }

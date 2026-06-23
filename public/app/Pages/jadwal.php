@@ -37,17 +37,6 @@ if (!empty($query)) {
     }
 }
 
-function getStatusBadge($status) {
-    $s = strtolower($status ?? '');
-    if (str_contains($s, 'stable') || str_contains($s, 'stabil')) {
-        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
-    }
-    if (str_contains($s, 'referral') || str_contains($s, 'rujukan')) {
-        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
-    }
-    return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
-}
-
 function calculateAge($dob) {
     if (empty($dob)) return '-';
     try {
@@ -64,6 +53,8 @@ function calculateAge($dob) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jadwal & Pencarian Pasien — MediaAdmin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../pages/global.css" rel="stylesheet">
+    <link href="../pages/table.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -112,47 +103,21 @@ function calculateAge($dob) {
             justify-content: space-between;
         }
 
-        .sv-navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
+        .burger-btn {
+            width: 40px; height: 40px; border: none; background: transparent;
+            border-radius: 10px; cursor: pointer; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            gap: 5px; transition: background 0.2s; margin-right: 12px; flex-shrink: 0;
         }
-
-        .sv-navbar-brand .logo-box {
-            width: 38px;
-            height: 38px;
-            background: var(--sv-blue);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: 800;
-            box-shadow: 0 3px 10px rgba(0, 122, 255, 0.3);
-        }
-
-        .sv-navbar-brand .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-
-        .sv-navbar-brand .brand-name {
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--sv-navy);
-        }
-
-        .sv-navbar-brand .brand-sub {
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            color: var(--sv-text-muted);
-            text-transform: uppercase;
-        }
-
+        .burger-btn:hover { background: rgba(0,0,0,0.05); }
+        .burger-btn span { display: block; width: 20px; height: 2.5px; background: var(--sv-text-main); border-radius: 2px; transition: 0.25s; }
+        .burger-btn.active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+        .burger-btn.active span:nth-child(2) { opacity: 0; }
+        .burger-btn.active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+        .mobile-menu { display: none; position: fixed; top: 68px; left: 0; right: 0; background: rgba(255,255,255,0.98); backdrop-filter: blur(20px); border-bottom: 1px solid var(--sv-border); padding: 12px; z-index: 999; flex-direction: column; gap: 4px; }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a { padding: 12px 16px; border-radius: 10px; text-decoration: none; color: var(--sv-text-main); font-weight: 500; font-size: 15px; transition: 0.2s; }
+        .mobile-menu a:hover { background: var(--sv-bg); }
         .sv-navbar-links {
             display: flex;
             align-items: center;
@@ -513,13 +478,9 @@ function calculateAge($dob) {
 
     <!-- ════ NAVBAR ════ -->
     <nav class="sv-navbar">
-        <a href="../index.php" class="sv-navbar-brand">
-            <div class="logo-box">SV</div>
-            <div class="brand-text">
-                <span class="brand-name">MediaAdmin</span>
-                <span class="brand-sub">CareVisit Monitor</span>
-            </div>
-        </a>
+        <button class="burger-btn" id="burgerBtn" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
         <div class="sv-navbar-links">
             <a href="../index.php">Beranda</a>
             <a href="about.php">Tentang Kami</a>
@@ -528,6 +489,13 @@ function calculateAge($dob) {
             <a href="login.php" class="btn-sv-primary ms-3">Masuk Admin</a>
         </div>
     </nav>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="../index.php">Beranda</a>
+        <a href="about.php">Tentang Kami</a>
+        <a href="jadwal.php">Cek Jadwal</a>
+        <a href="#kontak">Kontak</a>
+        <a href="login.php">Masuk Admin</a>
+    </div>
 
     <!-- ════ MAIN CONTAINER ════ -->
     <div class="container py-5">
@@ -901,5 +869,11 @@ function calculateAge($dob) {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('burgerBtn')?.addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.getElementById('mobileMenu')?.classList.toggle('open');
+        });
+    </script>
 </body>
 </html>

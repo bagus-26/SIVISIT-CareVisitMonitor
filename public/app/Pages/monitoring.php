@@ -12,9 +12,10 @@ $monitorings    = ($monitoringsRes['status_code'] === 200 && isset($monitoringsR
     ? $monitoringsRes['response']['data']
     : [];
 
-// Sort by date desc
+// Sort by date desc (include time to preserve same-day ordering)
 usort($monitorings, fn($a,$b) =>
-    strtotime($b['monitoring_date'] ?? '') <=> strtotime($a['monitoring_date'] ?? '')
+    strtotime(($b['monitoring_date'] ?? '') . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=>
+    strtotime(($a['monitoring_date'] ?? '') . ' ' . ($a['monitoring_time'] ?? '00:00:00'))
 );
 
 // Count by status
@@ -31,14 +32,6 @@ $userName    = htmlspecialchars($user['name']  ?? 'Petugas');
 $userInitial = strtoupper(substr($user['name'] ?? 'P', 0, 1));
 $userEmail   = htmlspecialchars($user['email'] ?? '');
 
-function getStatusBadge($status) {
-    $s = strtolower($status ?? '');
-    if (str_contains($s,'stable') || str_contains($s,'stabil'))
-        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
-    if (str_contains($s,'referral') || str_contains($s,'rujukan'))
-        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
-    return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -48,6 +41,8 @@ function getStatusBadge($status) {
     <title>Data Monitoring — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="../pages/global.css" rel="stylesheet">
+    <link href="../pages/table.css" rel="stylesheet">
     <style>
         .filter-tabs {
             display: flex;
@@ -180,13 +175,12 @@ function getStatusBadge($status) {
                                 <th>Rekomendasi / Catatan</th>
                                 <th>Status</th>
                                 <th>Petugas</th>
-                                <th style="text-align:right;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="monBody">
                             <?php if (empty($monitorings)): ?>
                                 <tr>
-                                    <td colspan="9">
+                                    <td colspan="8">
                                         <div class="sv-empty-state">
                                             <div class="empty-icon">🩺</div>
                                             <p>Belum ada catatan monitoring. <a href="tambah-monitoring.php">Catat monitoring pertama →</a></p>
@@ -228,11 +222,6 @@ function getStatusBadge($status) {
                                     <td><?= getStatusBadge($m['status'] ?? '') ?></td>
                                     <td style="font-size:12px;color:#636366;">
                                         <?= htmlspecialchars($m['user']['name'] ?? 'Petugas') ?>
-                                    </td>
-                                    <td style="text-align:right;">
-                                         <a href="detail-monitoring.php?id=<?= (int)($m['id'] ?? 0) ?>"
-                                            class="btn btn-sm btn-outline-primary py-0"
-                                            style="font-size:11.5px;">Detail</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

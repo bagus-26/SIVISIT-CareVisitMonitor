@@ -20,6 +20,8 @@ class Monitoring extends Model
         'oxygen_saturation',
         'symptoms',
         'notes',
+        'recommendation',
+        'next_visit_date',
         'status',
         'monitoring_time',
         'examination_focus',

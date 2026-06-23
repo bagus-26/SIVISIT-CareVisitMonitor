@@ -3,112 +3,130 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StorePatientRequest;
 use App\Models\Patient;
+use App\Models\Monitoring;
+use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /api/patients — semua pasien + monitoring terbaru
      */
-    public function index()
+    public function index(Request $request)
     {
-        $patients = Patient::with('monitorings')->get();
+        $query = Patient::with([
+            'monitorings' => fn($q) => $q->latest('monitoring_date')->latest('monitoring_time')
+        ]);
+
+        // Support pencarian by q (name, nik, patient_id)
+        if ($search = $request->query('q')) {
+            $q = '%' . $search . '%';
+            $query->where(function ($w) use ($q) {
+                $w->where('patient_name', 'LIKE', $q)
+                  ->orWhere('nik_dummy', 'LIKE', $q)
+                  ->orWhere('patient_id', 'LIKE', $q);
+            });
+        }
+
+        $patients = $query->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Patients list have been retrieved successfully.',
-            'data' => $patients
+            'message' => 'Daftar pasien berhasil diambil.',
+            'data'    => $patients,
         ], 200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * POST /api/patients — tambah pasien baru
      */
-    public function store(Request $request)
+    public function store(StorePatientRequest $request)
     {
-        $validatedData = $request->validate([
-            'patient_id' => 'required|string|unique:patients,patient_id',
-            'patient_name' => 'required|string|max:255',
-            'nik_dummy' => 'required|string|max:20',
-            'datebirth' => 'required|date',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'family_phone' => 'required|string',
-            'patient_category' => 'required|string',
-            'monitoring_date' => 'nullable|string', // can contain date-time or date
-        ]);
-
-        $patient = Patient::create([
-            'patient_id' => $validatedData['patient_id'],
-            'patient_name' => $validatedData['patient_name'],
-            'nik_dummy' => $validatedData['nik_dummy'],
-            'datebirth' => $validatedData['datebirth'],
-            'gender' => $validatedData['gender'],
-            'address' => $validatedData['address'],
-            'family_phone' => $validatedData['family_phone'],
-            'patient_category' => $validatedData['patient_category'],
-        ]);
-
-        // If monitoring_date is provided, register initial monitoring
-        if (!empty($validatedData['monitoring_date'])) {
-            $dateTime = strtotime($validatedData['monitoring_date']);
-            $date = date('Y-m-d', $dateTime);
-            $time = date('H:i:s', $dateTime);
-
-            // Get user_id from query or fallback
-            $userId = $request->input('user_id') ?? 1;
-
-            \App\Models\Monitoring::create([
-                'patient_id' => $patient->patient_id,
-                'user_id' => $userId,
-                'monitoring_date' => $date,
-                'monitoring_time' => $time,
-                'status' => 'Stable',
-            ]);
-        }
+        $patient = Patient::create($request->validated());
 
         return response()->json([
             'success' => true,
-            'message' => 'Patient created successfully.',
-            'data' => $patient
+            'message' => 'Pasien berhasil ditambahkan.',
+            'data'    => $patient,
         ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * GET /api/patients/{id} — detail pasien + semua monitoring
      */
     public function show(string $id)
     {
-     $patient =Patient::with('monitorings')->where('patient_id', $id)->first();
+        $patient = Patient::with([
+            'monitorings' => fn($q) => $q->with('user')->latest('monitoring_date')->latest('monitoring_time')
+        ])->where('patient_id', $id)->first();
 
-     if (!$patient) {
-         return response()->json([
-             'success' => false,
-             'message' => 'Patient not found.'
-         ], 404);
-     }
+        if (!$patient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pasien tidak ditemukan.',
+            ], 404);
+        }
 
-     return response()->json([
-         'success' => true,
-         'message' => 'Patient details have been retrieved successfully.',
-         'data' => $patient
-     ], 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail pasien berhasil diambil.',
+            'data'    => $patient,
+        ], 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * GET /api/patients/{id}/monitoring — riwayat monitoring pasien (alias show)
      */
-    public function update(Request $request, string $id)
+    public function monitoring(string $id)
     {
-        //
+        return $this->show($id);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * PUT/PATCH /api/patients/{id} — update data pasien
+     */
+    public function update(StorePatientRequest $request, string $id)
+    {
+        $patient = Patient::where('patient_id', $id)->first();
+
+        if (!$patient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pasien tidak ditemukan.',
+            ], 404);
+        }
+
+        $patient->update($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pasien berhasil diperbarui.',
+            'data'    => $patient->fresh(),
+        ], 200);
+    }
+
+    /**
+     * DELETE /api/patients/{id} — hapus pasien + semua monitoring-nya
      */
     public function destroy(string $id)
     {
-        //
+        $patient = Patient::where('patient_id', $id)->first();
+
+        if (!$patient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pasien tidak ditemukan.',
+            ], 404);
+        }
+
+        // Hapus monitoring terkait dulu
+        Monitoring::where('patient_id', $id)->delete();
+        $patient->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pasien dan seluruh data monitoring berhasil dihapus.',
+        ], 200);
     }
 }

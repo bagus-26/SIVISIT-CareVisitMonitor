@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePatientRequest;
 use App\Models\Patient;
 use App\Models\Monitoring;
 use Illuminate\Http\Request;
@@ -21,39 +22,18 @@ class PatientController extends Controller
         return view('patient.tambah-pasien');
     }
 
-    public function store(Request $request)
+    public function store(StorePatientRequest $request)
     {
-        $validatedData = $request->validate([
-            'patient_id' => 'required|string|unique:patients,patient_id',
-            'patient_name' => 'required|string|max:255',
-            'nik_dummy' => 'required|string|max:20',
-            'datebirth' => 'required|date',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'family_phone' => 'required|string',
-            'patient_category' => 'required|string',
-            'monitoring_date' => 'nullable|string',
-        ]);
+        $patient = Patient::create($request->validated());
 
-        $patient = Patient::create([
-            'patient_id' => $validatedData['patient_id'],
-            'patient_name' => $validatedData['patient_name'],
-            'nik_dummy' => $validatedData['nik_dummy'],
-            'datebirth' => $validatedData['datebirth'],
-            'gender' => $validatedData['gender'],
-            'address' => $validatedData['address'],
-            'family_phone' => $validatedData['family_phone'],
-            'patient_category' => $validatedData['patient_category'],
-        ]);
-
-        if (!empty($validatedData['monitoring_date'])) {
-            $dateTime = strtotime($validatedData['monitoring_date']);
+        if ($request->filled('monitoring_date')) {
+            $dateTime = strtotime($request->input('monitoring_date'));
             $date = date('Y-m-d', $dateTime);
             $time = date('H:i:s', $dateTime);
 
             Monitoring::create([
                 'patient_id' => $patient->patient_id,
-                'user_id' => Auth::id() ?? 1,
+                'user_id' => Auth::id(),
                 'monitoring_date' => $date,
                 'monitoring_time' => $time,
                 'status' => 'Stable',
@@ -69,21 +49,11 @@ class PatientController extends Controller
         return view('patient.edit-pasien', compact('patient'));
     }
 
-    public function update(Request $request, $patient_id)
+    public function update(StorePatientRequest $request, $patient_id)
     {
         $patient = Patient::findOrFail($patient_id);
 
-        $validatedData = $request->validate([
-            'patient_name' => 'required|string|max:255',
-            'nik_dummy' => 'required|string|max:20',
-            'datebirth' => 'required|date',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'family_phone' => 'required|string',
-            'patient_category' => 'required|string',
-        ]);
-
-        $patient->update($validatedData);
+        $patient->update($request->validated());
 
         return redirect()->route('admin.patients.index')->with('success', 'Data pasien berhasil diperbarui.');
     }

@@ -138,10 +138,23 @@
                                       placeholder="Deskripsikan keluhan atau kondisi yang ditemukan..." required>{{ old('symptoms') }}</textarea>
                         </div>
                         <div class="col-md-6">
-                            <label for="notes" class="form-label">Rekomendasi Tindak Lanjut</label>
+                            <label for="notes" class="form-label">Catatan Petugas</label>
                             <textarea name="notes" id="notes" class="form-control" rows="3"
-                                      placeholder="Contoh: Jadwalkan kontrol ulang dalam 3 hari...">{{ old('notes') }}</textarea>
+                                      placeholder="Catatan tambahan petugas...">{{ old('notes') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <label for="recommendation" class="form-label">Rekomendasi Tindak Lanjut</label>
+                            <textarea name="recommendation" id="recommendation" class="form-control" rows="2"
+                                      placeholder="Contoh: Jadwalkan kontrol ulang dalam 3 hari...">{{ old('recommendation') }}</textarea>
                             <div class="validation-hint">⚠️ Rekomendasi bersifat administratif, bukan nasihat medis.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="next_visit_date" class="form-label">Tanggal Kunjungan Berikutnya</label>
+                            <input type="date" name="next_visit_date" id="next_visit_date" class="form-control"
+                                   value="{{ old('next_visit_date') }}" min="{{ date('Y-m-d') }}">
+                            <div class="validation-hint">Jadwalkan kunjungan lanjutan jika diperlukan</div>
                         </div>
                     </div>
                 </div>

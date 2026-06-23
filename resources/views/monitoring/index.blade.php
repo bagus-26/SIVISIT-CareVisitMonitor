@@ -7,14 +7,16 @@
         <h1>Data Monitoring Kesehatan</h1>
         <p>Seluruh catatan monitoring pasien home care — diurutkan terbaru.</p>
     </div>
-    <a href="{{ route('admin.monitorings.create') }}" class="btn btn-primary">🩺 Catat Monitoring</a>
+    <a href="{{ route('admin.monitorings.create') }}" class="btn btn-primary">
+        <i class="bi bi-pencil-square me-1"></i> Catat Monitoring
+    </a>
 </div>
 
 {{-- Stat Cards --}}
 <div class="row g-3 mb-4">
     <div class="col-4 sv-animate-in sv-animate-in-1">
         <div class="sv-stat-card" style="--accent-color:#34C759;">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
             <div class="stat-label">Stabil</div>
             <div class="stat-value" style="color:#34C759;">{{ $countStable }}</div>
             <div class="stat-sub">Catatan monitoring</div>
@@ -22,7 +24,7 @@
     </div>
     <div class="col-4 sv-animate-in sv-animate-in-2">
         <div class="sv-stat-card" style="--accent-color:#FF9500;">
-            <div class="stat-icon">⚠️</div>
+            <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div class="stat-label">Perlu Kontrol</div>
             <div class="stat-value" style="color:#FF9500;">{{ $countControl }}</div>
             <div class="stat-sub">Butuh tindak lanjut</div>
@@ -30,7 +32,7 @@
     </div>
     <div class="col-4 sv-animate-in sv-animate-in-3">
         <div class="sv-stat-card" style="--accent-color:#FF3B30;">
-            <div class="stat-icon">🚨</div>
+            <div class="stat-icon"><i class="bi bi-hospital-fill"></i></div>
             <div class="stat-label">Perlu Rujukan</div>
             <div class="stat-value" style="color:#FF3B30;">{{ $countReferral }}</div>
             <div class="stat-sub">Segera dirujuk</div>
@@ -43,12 +45,12 @@
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div class="d-flex gap-2 flex-wrap" id="filterTabs">
             <button class="filter-tab active" data-filter="all">Semua ({{ $monitorings->count() }})</button>
-            <button class="filter-tab tab-stable"   data-filter="stabil">✅ Stabil ({{ $countStable }})</button>
-            <button class="filter-tab tab-control"  data-filter="kontrol">⚠️ Perlu Kontrol ({{ $countControl }})</button>
-            <button class="filter-tab tab-referral" data-filter="rujukan">🚨 Perlu Rujukan ({{ $countReferral }})</button>
+            <button class="filter-tab tab-stable"   data-filter="stabil">Stabil ({{ $countStable }})</button>
+            <button class="filter-tab tab-control"  data-filter="kontrol">Perlu Kontrol ({{ $countControl }})</button>
+            <button class="filter-tab tab-referral" data-filter="rujukan">Perlu Rujukan ({{ $countReferral }})</button>
         </div>
         <div style="position:relative;">
-            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8E8E93;pointer-events:none;">🔍</span>
+            <i class="bi bi-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8E8E93;pointer-events:none;"></i>
             <input type="text" id="tableSearch" placeholder="Cari nama pasien..."
                    style="padding:7px 12px 7px 32px;border:1.5px solid #D8DCE6;border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:#1C1C1E;transition:all .2s;min-width:200px;"
                    onfocus="this.style.borderColor='#007AFF'" onblur="this.style.borderColor='#D8DCE6'">
@@ -59,7 +61,7 @@
 {{-- Table --}}
 <div class="sv-table-wrap sv-animate-in">
     <div class="sv-section-header">
-        <h5>📋 Riwayat Monitoring</h5>
+        <h5><i class="bi bi-clipboard2-pulse me-2" style="color:var(--sv-blue);"></i>Riwayat Monitoring</h5>
         <span style="font-size:12px;color:#8E8E93;" id="monCount">{{ $monitorings->count() }} catatan</span>
     </div>
     <div class="table-responsive">
@@ -103,11 +105,11 @@
                     <td style="font-size:13px;max-width:160px;white-space:normal;">{{ Str::limit($m->symptoms ?? '-', 60) }}</td>
                     <td>
                         @if(str_contains($s,'stable') || str_contains($s,'stabil'))
-                            <span class="sv-badge sv-badge-stable">✅ Stabil</span>
+                            <span class="sv-badge sv-badge-stable">Stabil</span>
                         @elseif(str_contains($s,'referral') || str_contains($s,'rujukan'))
-                            <span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>
+                            <span class="sv-badge sv-badge-referral">Perlu Rujukan</span>
                         @else
-                            <span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>
+                            <span class="sv-badge sv-badge-control">Perlu Kontrol</span>
                         @endif
                     </td>
                     <td style="font-size:12px;color:#636366;">{{ $m->user->name ?? 'Petugas' }}</td>
@@ -120,7 +122,7 @@
                 <tr>
                     <td colspan="8">
                         <div class="sv-empty-state">
-                            <div class="empty-icon">🩺</div>
+                            <i class="bi bi-clipboard2-pulse" style="font-size:40px;color:#D1D5DB;"></i>
                             <p>Belum ada catatan monitoring. <a href="{{ route('admin.monitorings.create') }}">Catat monitoring pertama →</a></p>
                         </div>
                     </td>

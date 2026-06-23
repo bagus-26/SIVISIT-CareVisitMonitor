@@ -59,6 +59,8 @@ class MonitoringController extends Controller
             'oxygen_saturation' => 'nullable|numeric|between:50,100',
             'symptoms' => 'required|string',
             'notes' => 'nullable|string',
+            'recommendation' => 'nullable|string',
+            'next_visit_date' => 'nullable|date',
             'status' => 'required|in:Stable,Need Control,Need Referral',
         ]);
 

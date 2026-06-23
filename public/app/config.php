@@ -4,9 +4,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-define('API_BASE_URL', 'http://localhost/sivisit_CareVisitMonitor/public/api');
+require_once __DIR__ . '/Pages/helpers.php';
 
-// Initialize Mock Data in Session
+define('API_BASE_URL', '/api');
+
 function initMockData()
 {
     if (!isset($_SESSION['mock_patients'])) {
@@ -40,6 +41,26 @@ function initMockData()
                 'address' => 'Kost Joyogrand Kav. 5, Malang',
                 'family_phone' => '089912345678',
                 'patient_category' => 'Lainnya',
+            ],
+            [
+                'patient_id' => 'RM-2026-0004',
+                'patient_name' => 'Bpk. Hariyanto',
+                'nik_dummy' => '3578010101010004',
+                'datebirth' => '1975-06-22',
+                'gender' => 'Male',
+                'address' => 'Jl. Raya Tlogomas No. 45, Malang',
+                'family_phone' => '081998877665',
+                'patient_category' => 'Diabetes',
+            ],
+            [
+                'patient_id' => 'RM-2026-0005',
+                'patient_name' => 'Ibu Siti Rahma',
+                'nik_dummy' => '3578010101010005',
+                'datebirth' => '1952-03-14',
+                'gender' => 'Female',
+                'address' => 'Ds. Ketawanggede No. 8, Malang',
+                'family_phone' => '085677788899',
+                'patient_category' => 'Pasca Rawat',
             ],
         ];
     }
@@ -78,11 +99,42 @@ function initMockData()
                 'status' => 'Stable',
                 'user' => ['name' => 'Ns. Budi Santoso'],
             ],
+            [
+                'id' => 3,
+                'patient_id' => 'RM-2026-0004',
+                'user_id' => 1,
+                'monitoring_date' => date('Y-m-d'),
+                'monitoring_time' => '07:45:00',
+                'blood_pressure' => '145/95',
+                'body_temperature' => '36.8',
+                'heart_rate' => 92,
+                'respiratory_rate' => 22,
+                'oxygen_saturation' => 95,
+                'symptoms' => 'Gula darah tinggi, sering haus dan buang air kecil.',
+                'notes' => 'Perlu kontrol gula darah rutin dan pengaturan diet ketat.',
+                'status' => 'Need Control',
+                'user' => ['name' => 'Ns. Budi Santoso'],
+            ],
+            [
+                'id' => 4,
+                'patient_id' => 'RM-2026-0005',
+                'user_id' => 1,
+                'monitoring_date' => date('Y-m-d', strtotime('-1 day')),
+                'monitoring_time' => '14:00:00',
+                'blood_pressure' => '160/100',
+                'body_temperature' => '37.5',
+                'heart_rate' => 98,
+                'respiratory_rate' => 24,
+                'oxygen_saturation' => 92,
+                'symptoms' => 'Sesak napas ringan, badan lemas, tekanan darah tinggi.',
+                'notes' => 'Disarankan rujukan ke RS untuk penanganan lebih lanjut.',
+                'status' => 'Need Referral',
+                'user' => ['name' => 'Ns. Budi Santoso'],
+            ],
         ];
     }
 }
 
-// Mock API request handler
 function handleMockAPI($method, $endpoint, $data)
 {
     initMockData();
@@ -90,12 +142,10 @@ function handleMockAPI($method, $endpoint, $data)
     $parsed   = parse_url($endpoint);
     $path     = $parsed['path'] ?? '';
     
-    // Normalize path (strip query and API base)
     if (strpos($path, '/api') === 0) {
         $path = substr($path, 4);
     }
 
-    // 1. Auth Endpoint
     if ($path === '/login' && $method === 'POST') {
         return [
             'status_code' => 200,
@@ -112,7 +162,6 @@ function handleMockAPI($method, $endpoint, $data)
         ];
     }
 
-    // 2. Patients Listing and Creating
     if ($path === '/patients') {
         if ($method === 'GET') {
             $patients = $_SESSION['mock_patients'];
@@ -123,7 +172,6 @@ function handleMockAPI($method, $endpoint, $data)
                         $pMons[] = $m;
                     }
                 }
-                // Sort monitorings desc
                 usort($pMons, fn($a, $b) => strtotime($b['monitoring_date'] . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=> strtotime($a['monitoring_date'] . ' ' . ($a['monitoring_time'] ?? '00:00:00')));
                 $p['monitorings'] = $pMons;
             }
@@ -152,7 +200,6 @@ function handleMockAPI($method, $endpoint, $data)
         }
     }
 
-    // 3. Patient Detail / Monitorings list for Public Search
     if (preg_match('#^/patients/([^/]+)/monitoring(s)?$#', $path, $matches)) {
         $query = urldecode($matches[1]);
         $foundPatient = null;
@@ -172,7 +219,6 @@ function handleMockAPI($method, $endpoint, $data)
                 $pMons[] = $m;
             }
         }
-        // Add fake user object to monitoring for frontend
         foreach ($pMons as &$m) {
             if (!isset($m['user'])) $m['user'] = ['name' => 'Ns. Budi Santoso'];
         }
@@ -185,7 +231,6 @@ function handleMockAPI($method, $endpoint, $data)
         ];
     }
 
-    // 4. Patient Detail Actions (GET, PUT/PATCH, DELETE)
     if (preg_match('#^/patients/([^/]+)$#', $path, $matches)) {
         $id = urldecode($matches[1]);
         $index = -1;
@@ -230,7 +275,6 @@ function handleMockAPI($method, $endpoint, $data)
         }
     }
 
-    // 5. Monitorings Actions (GET, POST)
     if ($path === '/monitorings' || $path === '/monitoring') {
         if ($method === 'GET') {
             $monitorings = $_SESSION['mock_monitorings'];
@@ -281,7 +325,6 @@ function handleMockAPI($method, $endpoint, $data)
 
 function callAPI($method, $endpoint, $data = false)
 {
-    // If backend is offline or fails, it will catch and fallback via curl_exec error or code check.
     $curl = curl_init();
     $url = API_BASE_URL . $endpoint;
 
@@ -319,7 +362,7 @@ function callAPI($method, $endpoint, $data = false)
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
             }
             break;
-        default: // Jika GET
+        default:
             if ($data) {
                 $url = sprintf("%s?%s", $url, http_build_query($data));
             }
@@ -330,14 +373,13 @@ function callAPI($method, $endpoint, $data = false)
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5); // max 5s koneksi
-    curl_setopt($curl, CURLOPT_TIMEOUT, 10);       // max 10s eksekusi
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 10);
 
     $result = curl_exec($curl);
 
     if ($result === false) {
         curl_close($curl);
-        // Fallback to local session mock database
         return handleMockAPI($method, $endpoint, $data);
     }
 
@@ -345,7 +387,6 @@ function callAPI($method, $endpoint, $data = false)
     curl_close($curl);
 
     if ($httpCode === 0 || $httpCode >= 500) {
-        // Fallback to local session mock database on server errors/offline
         return handleMockAPI($method, $endpoint, $data);
     }
 
@@ -354,4 +395,3 @@ function callAPI($method, $endpoint, $data = false)
         'response' => json_decode($result, true)
     ];
 }
-?>

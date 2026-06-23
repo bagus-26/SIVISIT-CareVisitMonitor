@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office'
+      xmlns:w='urn:schemas-microsoft-com:office:word'
+      xmlns='http://www.w3.org/TR/REC-html40' lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="ProgId" content="Word.Document">
+    <meta name="Generator" content="Microsoft Word 15">
+    <title>AI Usage Log — SIVISIT CareVisit Monitor</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            margin: 2.5cm 3cm 2.5cm 4cm;
+            color: #000;
+            line-height: 1.5;
+        }
+        h1 {
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4pt;
+        }
+        h2 {
+            font-size: 12pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4pt;
+        }
+        .judul-laporan {
+            text-align: center;
+            margin-bottom: 20pt;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10pt;
+        }
+        .info-box {
+            border: 1px solid #ccc;
+            padding: 10pt;
+            margin-bottom: 16pt;
+            background: #f9f9f9;
+            font-size: 11pt;
+        }
+        .info-box p { margin: 4pt 0; }
+        .info-label { font-weight: bold; min-width: 130pt; display: inline-block; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+            margin-bottom: 20pt;
+        }
+        th {
+            border: 1px solid #000;
+            background: #DBEAFE;
+            padding: 6pt 8pt;
+            text-align: center;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+        td {
+            border: 1px solid #000;
+            padding: 6pt 8pt;
+            vertical-align: top;
+        }
+        td.no { text-align: center; width: 30pt; }
+        td.tanggal { text-align: center; width: 65pt; }
+        td.anggota { text-align: center; width: 80pt; }
+        td.tools  { text-align: center; width: 90pt; }
+        tr:nth-child(even) td { background: #EFF6FF; }
+
+        .catatan {
+            font-size: 10pt;
+            font-style: italic;
+            color: #555;
+            margin-top: 8pt;
+            border-left: 3pt solid #2563EB;
+            padding-left: 10pt;
+        }
+        .ttd-area {
+            margin-top: 40pt;
+            display: flex;
+            justify-content: space-between;
+        }
+        .ttd-box {
+            width: 40%;
+            text-align: center;
+        }
+        .ttd-line {
+            border-top: 1px solid #000;
+            margin-top: 50pt;
+            padding-top: 4pt;
+            font-size: 11pt;
+        }
+        .disclaimer {
+            margin-top: 20pt;
+            padding: 8pt;
+            border: 1px solid #F59E0B;
+            background: #FFFBEB;
+            font-size: 10pt;
+        }
+        @media print {
+            body { margin: 1cm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="judul-laporan">
+    <h1>LAPORAN PENGGUNAAN AI</h1>
+    <h2>AI Usage Log — SIVISIT CareVisit Monitor</h2>
+    <p style="font-size:11pt;margin:6pt 0;">
+        Pemrograman Web — Informatika Kesehatan<br>
+        ITSK Dr. Soepraoen Malang &bull; Tahun Akademik 2025/2026
+    </p>
+</div>
+
+<div class="info-box">
+    <p><span class="info-label">Nama Aplikasi</span>: SIVISIT CareVisit Monitor</p>
+    <p><span class="info-label">Mata Kuliah</span>: Pemrograman Web</p>
+    <p><span class="info-label">Program Studi</span>: Informatika Kesehatan</p>
+    <p><span class="info-label">Institusi</span>: ITSK Dr. Soepraoen Malang</p>
+    <p><span class="info-label">Tahun Akademik</span>: 2025/2026</p>
+    <p><span class="info-label">Tools AI Digunakan</span>: Google Gemini (Antigravity IDE)</p>
+    <p><span class="info-label">Tanggal Laporan</span>: Juni 2026</p>
+</div>
+
+<p style="font-weight:bold;margin-bottom:6pt;">Ketentuan Penggunaan AI:</p>
+<p style="margin-bottom:12pt;font-size:11pt;">
+    Setiap kelompok wajib mencatat penggunaan AI secara transparan. AI boleh digunakan untuk
+    <strong>brainstorming, desain database, debugging, dokumentasi, dan testing</strong>,
+    tetapi hasilnya <u>wajib diverifikasi dan dipahami oleh tim</u>.
+    Seluruh kode hasil AI telah di-review, dimodifikasi, dan diuji secara manual.
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th style="width:30pt;">No</th>
+            <th style="width:65pt;">Tanggal</th>
+            <th style="width:80pt;">Nama Anggota</th>
+            <th style="width:90pt;">Tools AI</th>
+            <th>Prompt Penting</th>
+            <th>Hasil dari AI</th>
+            <th>Verifikasi / Revisi Tim</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="no">1</td>
+            <td class="tanggal">01 Jun 2026</td>
+            <td class="anggota">Tim Kelompok</td>
+            <td class="tools">Google Gemini</td>
+            <td>Buatkan rancangan database untuk aplikasi monitoring kesehatan home care dengan entitas pasien dan monitoring kesehatan</td>
+            <td>Saran struktur tabel: <em>patients</em> (patient_id, patient_name, nik_dummy, datebirth, gender, address, family_phone, patient_category) dan <em>monitorings</em> (id, patient_id, user_id, monitoring_date, blood_pressure, body_temperature, symptoms, notes, status)</td>
+            <td>Direvisi: ditambahkan kolom <em>respiratory_rate</em>, <em>oxygen_saturation</em>, <em>heart_rate</em> sesuai kebutuhan klinis; nama kolom disesuaikan konvensi Laravel.</td>
+        </tr>
+        <tr>
+            <td class="no">2</td>
+            <td class="tanggal">05 Jun 2026</td>
+            <td class="anggota">Tim Kelompok</td>
+            <td class="tools">Google Gemini</td>
+            <td>Perbaiki validasi Laravel untuk input tekanan darah format "120/80" dan suhu tubuh rentang 35–42 derajat Celsius</td>
+            <td>Contoh rules validasi: <em>blood_pressure</em> =&gt; ["required", "regex:/^\d{2,3}\/\d{2,3}$/"], <em>body_temperature</em> =&gt; ["required", "numeric", "min:35", "max:42"]</td>
+            <td>Diuji manual dengan berbagai edge case (185/110, 34.5°C). Regex disesuaikan agar tidak terlalu ketat; rentang suhu dikonfirmasi sesuai standar klinis.</td>
+        </tr>
+        <tr>
+            <td class="no">3</td>
+            <td class="tanggal">10 Jun 2026</td>
+            <td class="anggota">Tim Kelompok</td>
+            <td class="tools">Google Gemini</td>
+            <td>Buat API endpoint Laravel GET /api/patients dan GET /api/patients/{id}/monitoring yang dapat diakses frontend PHP native</td>
+            <td>Template controller API dengan method <em>index()</em> mengembalikan daftar pasien dengan relasi monitoring, method <em>show()</em> mengembalikan riwayat monitoring per pasien dalam format JSON</td>
+            <td>Diuji via Postman dan browser. Endpoint publik (tanpa Sanctum) diverifikasi aman karena hanya read-only dan seluruh data bersifat dummy/simulasi.</td>
+        </tr>
+        <tr>
+            <td class="no">4</td>
+            <td class="tanggal">15 Jun 2026</td>
+            <td class="anggota">Tim Kelompok</td>
+            <td class="tools">Google Gemini</td>
+            <td>Buat README instalasi Laravel 12 dan panduan deploy ke InfinityFree shared hosting menggunakan FileZilla FTP</td>
+            <td>Template README mencakup: requirements (PHP 8.3+, Composer, MySQL), langkah instalasi (clone, composer install, .env setup, migrate, serve), dan panduan struktur folder public_html</td>
+            <td>Diedit sesuai aplikasi kelompok: ditambahkan langkah seed data dummy, catatan SESSION_DRIVER=file untuk InfinityFree, dan disclaimer data simulasi.</td>
+        </tr>
+        <tr>
+            <td class="no">5</td>
+            <td class="tanggal">18 Jun 2026</td>
+            <td class="anggota">Tim Kelompok</td>
+            <td class="tools">Google Gemini</td>
+            <td>Buatkan tampilan dashboard admin yang modern dengan sidebar dark navy, kartu statistik, dan tabel data pasien responsif menggunakan Bootstrap 5 dan custom CSS</td>
+            <td>Template HTML/CSS: sidebar dark navy (#0F172A), stats cards dengan border-top warna berbeda per status, tabel dengan hover effect, topbar dengan pencarian global dan avatar pengguna</td>
+            <td>Diimplementasikan ke Blade Laravel. Warna disesuaikan ke #001A42, ditambahkan filter tab status, validasi client-side JavaScript, integrasi data Eloquent ORM, dan Bootstrap Icons.</td>
+        </tr>
+        <tr>
+            <td class="no">6</td>
+            <td class="tanggal">20 Jun 2026</td>
+            <td class="anggota">Tim Kelompok</td>
+            <td class="tools">Google Gemini</td>
+            <td>Buat landing page frontend PHP native yang responsif sesuai desain Figma: navbar teal, hero section pencarian pasien, tentang layanan, cara kerja, dan footer ITSK Soepraoen Malang</td>
+            <td>Template HTML+CSS landing page: navbar sticky glassmorphism, hero section putih-bersih dengan form pencarian kode pasien, seksi cara kerja 3 langkah berstep, dan footer informatif</td>
+            <td>Diadaptasi ke PHP native dan dihubungkan ke API Laravel. Warna disesuaikan ke teal (#00B894), diuji responsif di mobile 375px dan desktop 1440px.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="catatan">
+    <strong>Catatan:</strong> Seluruh data pasien dan riwayat monitoring dalam aplikasi ini bersifat simulasi/dummy
+    untuk keperluan akademik. Sistem ini <strong>tidak memberikan diagnosis medis</strong>.
+    Rekomendasi yang dihasilkan hanya berupa tindak lanjut administratif.
+</div>
+
+<div class="disclaimer" style="margin-top:16pt;">
+    <strong>Disclaimer:</strong> Penggunaan AI dalam pengembangan proyek ini bersifat sebagai alat bantu,
+    bukan pengganti pemahaman tim. Setiap output AI telah dikaji ulang, dimodifikasi, dan divalidasi
+    secara manual oleh anggota tim sebelum diterapkan ke dalam kode produksi.
+</div>
+
+<div class="ttd-area" style="display:block;margin-top:36pt;">
+    <table style="width:100%;border:none;">
+        <tr>
+            <td style="border:none;width:50%;text-align:center;padding:0;">
+                <p style="margin:0;">Malang, Juni 2026</p>
+                <p style="margin:0;">Mengetahui,</p>
+                <p style="margin:0;font-weight:bold;">Dosen Pengampu</p>
+                <br><br><br><br>
+                <div style="border-top:1px solid #000;padding-top:4pt;">
+                    <p style="margin:0;">(_________________________)</p>
+                    <p style="margin:0;font-size:10pt;">NIP/NIDN.</p>
+                </div>
+            </td>
+            <td style="border:none;width:50%;text-align:center;padding:0;">
+                <p style="margin:0;">Malang, Juni 2026</p>
+                <p style="margin:0;">Hormat kami,</p>
+                <p style="margin:0;font-weight:bold;">Tim Kelompok</p>
+                <br><br><br><br>
+                <div style="border-top:1px solid #000;padding-top:4pt;">
+                    <p style="margin:0;">(_________________________)</p>
+                    <p style="margin:0;font-size:10pt;">NIM.</p>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
