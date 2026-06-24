@@ -8,38 +8,6 @@ use Illuminate\Http\Request;
 
 class MonitoringController extends Controller
 {
-    /**
-     * GET /api/monitorings — semua data monitoring + relasi pasien & user
-     */
-    public function index(Request $request)
-    {
-        $query = Monitoring::with([
-            'patient',
-            'user' => fn($q) => $q->select('id', 'name', 'email'),
-        ])->latest('monitoring_date')->latest('monitoring_time');
-
-        // Filter by patient_id
-        if ($pid = $request->query('patient_id')) {
-            $query->where('patient_id', $pid);
-        }
-
-        // Filter by date
-        if ($date = $request->query('date')) {
-            $query->whereDate('monitoring_date', $date);
-        }
-
-        $monitorings = $query->get();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data monitoring berhasil diambil.',
-            'data'    => $monitorings,
-        ], 200);
-    }
-
-    /**
-     * POST /api/monitorings — simpan monitoring baru
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -67,7 +35,6 @@ class MonitoringController extends Controller
 
         $monitoring = Monitoring::create($validated);
 
-        // Load relasi untuk response
         $monitoring->load(['patient', 'user' => fn($q) => $q->select('id', 'name', 'email')]);
 
         return response()->json([
@@ -77,33 +44,6 @@ class MonitoringController extends Controller
         ], 201);
     }
 
-    /**
-     * GET /api/monitorings/{id} — detail satu monitoring
-     */
-    public function show(string $id)
-    {
-        $monitoring = Monitoring::with([
-            'patient',
-            'user' => fn($q) => $q->select('id', 'name', 'email'),
-        ])->find($id);
-
-        if (!$monitoring) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data monitoring tidak ditemukan.',
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Detail monitoring berhasil diambil.',
-            'data'    => $monitoring,
-        ], 200);
-    }
-
-    /**
-     * GET /api/monitoring/status/{status} — filter monitoring by status
-     */
     public function byStatus(string $status)
     {
         $allowed = ['Stable', 'Need Control', 'Need Referral'];
@@ -126,28 +66,6 @@ class MonitoringController extends Controller
             'success' => true,
             'message' => "Data monitoring dengan status '$status' berhasil diambil.",
             'data'    => $monitorings,
-        ], 200);
-    }
-
-    /**
-     * DELETE /api/monitorings/{id} — hapus monitoring
-     */
-    public function destroy(string $id)
-    {
-        $monitoring = Monitoring::find($id);
-
-        if (!$monitoring) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data monitoring tidak ditemukan.',
-            ], 404);
-        }
-
-        $monitoring->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data monitoring berhasil dihapus.',
         ], 200);
     }
 }
