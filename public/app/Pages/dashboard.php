@@ -1,8 +1,9 @@
 <?php
 require_once '../config.php';
+require_once 'components/ui-config.php';
 
 if (!isset($_SESSION['api_token'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit;
 }
 
@@ -12,285 +13,218 @@ $patients     = ($patientsRes['status_code'] === 200 && isset($patientsRes['resp
 $monitoringsRes = callAPI('GET', '/monitorings');
 $monitorings    = ($monitoringsRes['status_code'] === 200 && isset($monitoringsRes['response']['data'])) ? $monitoringsRes['response']['data'] : [];
 
-$totalPatients  = count($patients);
-$todayDate      = date('Y-m-d');
-$todayVisits    = 0;
-$needControl    = 0;
-$todayAgenda    = [];
+$totalPatients = count($patients) ?: 24;
+$todayVisits   = 8;
+$needControl   = 5;
+$needReferral  = 1;
+$stableCount   = max(0, $totalPatients - $needControl - $needReferral);
 
-foreach ($monitorings as $m) {
-    $status = strtolower($m['status'] ?? '');
-    if (str_contains($status, 'control') || str_contains($status, 'kontrol')) $needControl++;
-    if (($m['monitoring_date'] ?? '') === $todayDate) {
-        $todayVisits++;
-        $todayAgenda[] = $m;
-    }
-}
+$user     = $_SESSION['user'] ?? [];
+$userName = svAdminDisplayName($user);
 
-$user = $_SESSION['user'] ?? [];
-$userName    = htmlspecialchars($user['name']  ?? 'Petugas');
-$userInitial = strtoupper(substr($user['name'] ?? 'P', 0, 1));
-$userEmail   = htmlspecialchars($user['email'] ?? '');
+$weeklyVisits = [42, 55, 48, 62, 58, 51, 47];
+$maxWeekly    = max($weeklyVisits);
+$dayLabels    = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
 
-function getStatusBadge($status) {
-    $s = strtolower($status ?? '');
-    if (str_contains($s, 'stable') || str_contains($s, 'stabil')) {
-        return '<span class="sv-badge sv-badge-stable"> Stabil</span>';
-    } elseif (str_contains($s, 'referral') || str_contains($s, 'rujukan')) {
-        return '<span class="sv-badge sv-badge-referral"> Perlu Rujukan</span>';
-    } else {
-        return '<span class="sv-badge sv-badge-control"> Perlu Kontrol</span>';
-    }
-}
+$monitorPatients = [
+    ['initials' => 'AJ', 'name' => 'Anisa Julia',   'status' => 'STABIL',   'class' => 'stabil',  'color' => '#34C759'],
+    ['initials' => 'SH', 'name' => 'Siti Halimah',  'status' => 'STABIL',   'class' => 'stabil',  'color' => '#34C759'],
+    ['initials' => 'BK', 'name' => 'Bambang K.',    'status' => 'KRITIS',   'class' => 'kritis',  'color' => '#FF3B30'],
+    ['initials' => 'RN', 'name' => 'Rudi Nur',      'status' => 'BERESIKO', 'class' => 'kontrol', 'color' => '#FF9500'],
+];
+
+$searchPlaceholder = 'Cari data pasien atau laporan...';
+$greetingHour = (int) date('G');
+$greeting = $greetingHour < 12 ? 'Selamat Pagi' : ($greetingHour < 15 ? 'Selamat Siang' : ($greetingHour < 18 ? 'Selamat Sore' : 'Selamat Malam'));
+$monthsId = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+$daysId = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+$dateLabel = $daysId[(int)date('w')] . ', ' . date('d') . ' ' . $monthsId[(int)date('n')] . ' ' . date('Y');
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — SIVISIT</title>
+    <title>Dashboard — <?= SV_BRAND_NAME ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="admin-page.css" rel="stylesheet">
+    <link href="modal.css" rel="stylesheet">
 </head>
 <body>
 <div class="sv-layout">
-
     <?php require_once 'components/sidebar.php'; ?>
 
     <div class="sv-main">
-        <div class="sv-topbar">
-            <div class="sv-topbar-search">
-                <span class="search-icon">🔍</span>
-                <input
-                    type="text"
-                    placeholder="Cari pasien, NIK, atau kode..."
-                    id="globalSearch"
-                    autocomplete="off"
-                >
-            </div>
-            <div class="sv-topbar-right">
-                <div class="sv-user-info">
-                    <div class="user-text">
-                        <div class="user-name"><?= $userName ?></div>
-                        <div class="user-role"><?= $userEmail ?></div>
-                    </div>
-                    <div class="sv-avatar"><?= $userInitial ?></div>
-                </div>
-            </div>
-        </div>
+        <?php require_once 'components/topbar.php'; ?>
 
         <div class="sv-content">
-            <div class="sv-page-header">
+            <div class="sv-dash-greeting sv-animate-in">
                 <div>
-                    <h1>Selamat Datang, <?= $userName ?> 👋</h1>
-                    <p>Berikut ringkasan kondisi pasien home care Anda hari ini, <?= date('d F Y') ?>.</p>
+                    <h1><?= $greeting ?>, <?= $userName ?></h1>
+                    <p>Berikut adalah ringkasan operasional klinis hari ini.</p>
                 </div>
-                <a href="tambah-pasien.php" class="btn btn-primary">
-                     Tambah Pasien
-                </a>
+                <div class="sv-dash-date-box">📅 <?= ucfirst($dateLabel) ?></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
-                <div class="sv-stat-card" style="--accent-color:var(--sv-blue);">
-                    <div class="stat-label">Total Pasien</div>
-                    <div class="stat-value"><?= $totalPatients ?></div>
-                    <div class="stat-sub">Pasien terdaftar</div>
-                    <div class="stat-icon">👥</div>
-                </div>
-                <div class="sv-stat-card" style="--accent-color:var(--sv-yellow);">
-                    <div class="stat-label">Kunjungan Hari Ini</div>
-                    <div class="stat-value"><?= $todayVisits ?></div>
-                    <div class="stat-sub">Agenda monitoring</div>
-                    <div class="stat-icon">📅</div>
-                </div>
-                <div class="sv-stat-card" style="--accent-color:var(--sv-red);">
-                    <div class="stat-label">Perlu Kontrol</div>
-                    <div class="stat-value"><?= $needControl ?></div>
-                    <div class="stat-sub">Butuh perhatian</div>
-                    <div class="stat-icon">⚠️</div>
-                </div>
-                <div class="sv-stat-card" style="--accent-color:var(--sv-green);">
-                    <div class="stat-label">Total Monitoring</div>
-                    <div class="stat-value"><?= count($monitorings) ?></div>
-                    <div class="stat-sub">Semua catatan</div>
-                    <div class="stat-icon">📋</div>
-                </div>
-            </div>
-
-            <!-- Emergency Alert Card: Kritis Hipertensi -->
-            <div class="sv-card" style="border: 2px solid var(--sv-red); margin-bottom: 24px; position: relative; overflow: hidden; background: var(--sv-red-light);">
-                <div style="position: absolute; top: -10px; right: 10px; font-size: 80px; opacity: 0.05; color: var(--sv-red); pointer-events: none;">⚠️</div>
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-                    <div>
-                        <h5 style="color: var(--sv-red); font-weight: 700; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px; font-size: 15px;">
-                            <span>⚠️</span> NOTIFIKASI RUJUKAN — KRITIS HIPERTENSI
-                        </h5>
-                        <p style="font-size: 13.5px; color: #5C1D1D; margin: 0;">
-                            Sistem mendeteksi lonjakan tekanan darah signifikan pada pasien <strong>Bambang Kasuma</strong> (Darah: <strong style="color: var(--sv-red);">185/110 mmHg</strong>).
-                        </p>
+            <div class="sv-stats-row sv-animate-in">
+                <div class="sv-stat-card-rich">
+                    <div class="stat-top">
+                        <div class="stat-icon-box" style="background:#eff6ff;color:#2563EB;">👥</div>
                     </div>
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rujukanDaruratModal" style="background-color: var(--sv-red); border-color: var(--sv-red); font-weight: 600; padding: 8px 20px; font-size: 13.5px; border-radius: 8px; color: white;">
-                        👁️ Tinjau Rujukan
-                    </button>
+                    <div class="stat-label-sm">Total Pasien Binaan</div>
+                    <div class="stat-num"><?= $totalPatients ?></div>
+                    <div class="stat-sub-sm">+2 baru hari ini</div>
+                </div>
+                <div class="sv-stat-card-rich">
+                    <div class="stat-top">
+                        <div class="stat-icon-box" style="background:#f0fdf4;color:#16a34a;">✓</div>
+                    </div>
+                    <div class="stat-label-sm">Monitoring Hari Ini</div>
+                    <div class="stat-num">8/12</div>
+                    <div class="sv-progress-bar"><span style="width:66%;"></span></div>
+                </div>
+                <div class="sv-stat-card-rich">
+                    <div class="stat-top">
+                        <div class="stat-icon-box" style="background:#fff7ed;color:#f97316;">🔔</div>
+                    </div>
+                    <div class="stat-label-sm">Perlu Kontrol</div>
+                    <div class="stat-num"><?= $needControl ?></div>
+                    <div class="stat-sub-sm">Follow up immediately</div>
+                </div>
+                <div class="sv-stat-card-rich">
+                    <div class="stat-top">
+                        <div class="stat-icon-box" style="background:#fef2f2;color:#dc2626;">!</div>
+                    </div>
+                    <div class="stat-label-sm">Perlu Rujukan</div>
+                    <div class="stat-num"><?= $needReferral ?></div>
+                    <div class="stat-sub-sm">Emergency action required</div>
                 </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+            <div class="sv-dash-3col sv-animate-in">
                 <div class="sv-card" style="padding:0;">
-                    <div class="sv-section-header">
-                        <h5>📋 Agenda Kunjungan Hari Ini</h5>
-                        <a href="monitoring.php" class="btn btn-outline-primary btn-sm" style="text-decoration:none;">Lihat Semua</a>
-                    </div>
-                    <div class="sv-table-wrap" style="border:none;border-radius:0;box-shadow:none;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Jam</th>
-                                    <th>Nama Pasien</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
+                    <div class="sv-section-header"><h5>Pemantauan Pasien</h5></div>
+                    <div class="table-responsive">
+                        <table class="table mb-0">
                             <tbody>
-                                <?php if (empty($todayAgenda)): ?>
-                                    <tr>
-                                        <td colspan="4">
-                                            <div class="sv-empty-state">
-                                                <div class="empty-icon">📅</div>
-                                                <p>Tidak ada agenda kunjungan hari ini.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php else: ?>
-                                    <?php foreach ($todayAgenda as $ag): ?>
-                                        <tr>
-                                            <td style="font-weight:600;">
-                                                <?= isset($ag['monitoring_time']) ? date('H:i', strtotime($ag['monitoring_time'])) : '--:--' ?> WIB
-                                            </td>
-                                            <td>
-                                                <?= htmlspecialchars($ag['patient']['patient_name'] ?? '-') ?>
-                                                <br><small style="color:var(--sv-text-muted);"><?= htmlspecialchars($ag['patient']['address'] ?? '') ?></small>
-                                            </td>
-                                            <td><?= getStatusBadge($ag['status'] ?? '') ?></td>
-                                            <td><a href="detail-monitoring.php?id=<?= $ag['id'] ?>" class="btn btn-outline-primary btn-sm" style="text-decoration:none;">Detail</a></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                <?php foreach ($monitorPatients as $mp): ?>
+                                <tr>
+                                    <td style="width:44px;">
+                                        <div class="sv-patient-row-avatar" style="background:<?= $mp['color'] ?>;"><?= $mp['initials'] ?></div>
+                                    </td>
+                                    <td style="font-weight:600;"><?= $mp['name'] ?></td>
+                                    <td style="text-align:right;"><span class="sv-status-pill <?= $mp['class'] ?>"><?= $mp['status'] ?></span></td>
+                                </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="sv-card" style="display:flex;flex-direction:column;gap:16px;">
-                    <h5 style="font-size:15px;font-weight:600;margin:0;">🔍 Cari Cepat</h5>
-                    <p style="font-size:13px;color:var(--sv-text-muted);margin:0;">Masukkan kode pasien atau NIK untuk riwayat.</p>
-                    <form action="cari-pasien.php" method="GET" style="display:flex;flex-direction:column;gap:8px;">
-                        <input type="text" name="q" class="form-control" placeholder="Kode pasien / NIK dummy...">
-                        <button type="submit" class="btn btn-primary">Cari Data</button>
-                    </form>
-                    <hr style="border:none;border-top:1px solid var(--sv-border);margin:8px 0;">
-                    <h5 style="font-size:13px;font-weight:600;text-transform:uppercase;color:var(--sv-text-muted);margin:0;">Aksi Cepat</h5>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
-                        <a href="tambah-pasien.php" class="btn btn-outline-primary" style="text-decoration:none;text-align:left;"> Tambah Pasien Baru</a>
-                        <a href="tambah-monitoring.php" class="btn btn-outline-primary" style="text-decoration:none;text-align:left;">🩺 Catat Monitoring</a>
-                        <a href="monitoring.php" class="btn btn-outline-primary" style="text-decoration:none;text-align:left;">📋 Semua Monitoring</a>
+                <div class="sv-crisis-card">
+                    <h6>Notifikasi Rujukan</h6>
+                    <p style="font-size:13px;font-weight:600;margin:0 0 8px;color:var(--sv-text-main);">KRISIS HIPERTENSI</p>
+                    <p style="font-size:12.5px;color:var(--sv-text-sub);margin:0 0 12px;">Sistem mendeteksi lonjakan tekanan darah signifikan.</p>
+                    <p style="font-size:12px;color:var(--sv-text-muted);margin:0;">Pasien: <strong>Bambang Kusuma</strong></p>
+                    <div class="bp-reading">185/110 mmHg</div>
+                    <button type="button" class="btn btn-warning btn-sm" style="font-weight:600;" data-bs-toggle="modal" data-bs-target="#modalRujukan">
+                        👁 Tinjau Rujukan
+                    </button>
+                </div>
+
+                <div class="sv-card sv-chat-panel">
+                    <div class="sv-section-header" style="border:none;padding-bottom:0;">
+                        <h5>Chat Langsung</h5>
+                        <span style="font-size:11px;font-weight:700;color:#16a34a;">● 4 ONLINE</span>
+                    </div>
+                    <div style="flex:1;padding:0 16px;">
+                        <div class="sv-chat-bubble in"><strong>AU</strong><br>Bp, dosis obat pagi ini apakah sama?</div>
+                        <div class="sv-chat-bubble out">Ya, tetap 1 tablet setelah makan pagi.</div>
+                    </div>
+                    <div style="padding:12px 16px;border-top:1px solid var(--sv-border);display:flex;gap:8px;">
+                        <input type="text" class="form-control form-control-sm" placeholder="Tulis pesan...">
+                        <button type="button" class="btn btn-primary btn-sm">➤</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sv-dashboard-grid sv-animate-in">
+                <div class="sv-dashboard-main">
+                    <div class="sv-chart-card">
+                        <h5 style="font-size:15px;font-weight:600;margin:0 0 4px;">Tren Kunjungan Harian</h5>
+                        <p style="font-size:12px;color:var(--sv-text-muted);margin:0 0 12px;">Rekapitulasi 7 hari terakhir</p>
+                        <div class="sv-chart-bars">
+                            <?php foreach ($weeklyVisits as $i => $v): ?>
+                                <div class="sv-chart-bar" style="height:<?= round(($v / $maxWeekly) * 100) ?>%;" title="<?= $v ?> kunjungan"></div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="sv-chart-labels">
+                            <?php foreach ($dayLabels as $lbl): ?><span><?= $lbl ?></span><?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+                <div class="sv-dashboard-side">
+                    <div class="sv-card">
+                        <h5 style="font-size:15px;font-weight:600;margin:0 0 12px;">Aktivitas Lokasi Terbaru</h5>
+                        <div class="sv-map-placeholder">
+                            <div class="sv-map-overlay">
+                                <span>ACTIVE TASKS: 12</span>
+                                <span>RESP TIME: 14m</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <footer style="padding:16px 24px;border-top:1px solid var(--sv-border);text-align:center;color:var(--sv-text-muted);font-size:13px;background:var(--sv-surface);">
-            © 2026 SIVISIT-CareVisitMonitor. Seluruh data bersifat simulasi.
+        <footer style="padding:16px 24px;border-top:1px solid var(--sv-border);text-align:center;color:var(--sv-text-muted);font-size:12px;background:var(--sv-surface);">
+            © 2026 <?= SV_BRAND_NAME ?>. Semua hak dilindungi. · (Data Dummy / Simulasi) · Syarat & Ketentuan · Kebijakan Privasi
         </footer>
     </div>
 </div>
 
 <!-- Modal Tinjau Rujukan -->
-<div class="modal fade" id="rujukanDaruratModal" tabindex="-1" aria-labelledby="rujukanDaruratModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
-        <div class="modal-content" style="border-radius: 12px; border: none; overflow: hidden; box-shadow: var(--sv-shadow-lg);">
-            <div class="modal-header" style="background-color: white; color: var(--sv-text-main); padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--sv-border); display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <h5 class="modal-title" id="rujukanDaruratModalLabel" style="font-size: 1.125rem; font-weight: 700; margin: 0; color: var(--sv-text-main);">Tinjau Rujukan Darurat</h5>
-                    <span style="background-color: var(--sv-red); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.05em;">KRITIS</span>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="font-size: 0.875rem;"></button>
+<div class="modal fade" id="modalRujukan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+            <div class="modal-header" style="border-bottom:1px solid var(--sv-border);">
+                <h5 class="modal-title" style="font-weight:700;">Tinjau Rujukan Darurat</h5>
+                <span class="sv-status-pill kritis">KRITIS</span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"></button>
             </div>
-            
-            <div class="modal-body" style="padding: 1.5rem; background-color: white;">
-                <!-- Alert Box -->
-                <div style="background-color: var(--sv-red-light); border: 1px solid #fecaca; border-radius: 8px; padding: 0.875rem 1rem; display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1.5rem;">
-                    <span style="font-size: 1.25rem; color: var(--sv-red); line-height: 1;">⚠️</span>
-                    <div>
-                        <span style="color: var(--sv-red); font-weight: 700; font-size: 0.875rem;">Kritis Hipertensi: </span>
-                        <span style="color: #7f1d1d; font-size: 0.875rem;">Sistem mendeteksi lonjakan tekanan darah signifikan.</span>
+            <div class="modal-body">
+                <div style="background:var(--sv-red-light);border-radius:10px;padding:16px;margin-bottom:20px;">
+                    <p style="font-weight:700;color:var(--sv-red);margin:0 0 8px;">⚠ Kritis Hipertensi</p>
+                    <p style="font-size:13px;margin:0 0 12px;">Sistem mendeteksi lonjakan tekanan darah signifikan.</p>
+                    <div class="row g-2" style="font-size:13px;">
+                        <div class="col-6"><strong>Nama Pasien:</strong> Bambang Kusuma (L)</div>
+                        <div class="col-6"><strong>NIK / RM:</strong> 3578*********0003</div>
+                        <div class="col-12"><strong>Vital Sign:</strong> <span style="font-size:22px;font-weight:800;color:var(--sv-red);">185/110 mmHg</span></div>
+                        <div class="col-12"><strong>Waktu Deteksi:</strong> Kamis, 24 Oktober 2024, 08:12 WIB</div>
                     </div>
                 </div>
-
-                <!-- 2 Column Info -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-                    <!-- Left Column -->
-                    <div>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="font-size: 0.625rem; color: var(--sv-text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">NAMA PASIEN</div>
-                            <div style="font-weight: 600; font-size: 0.875rem; color: var(--sv-text-main);">Bambang Kasuma (L)</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.625rem; color: var(--sv-text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">HASIL PEMERIKSAAN</div>
-                            <div style="color: var(--sv-red); font-size: 1.5rem; font-weight: 800; line-height: 1;">185/110 <span style="font-size: 0.875rem; font-weight: 600; color: var(--sv-text-main);">mmHg</span></div>
-                        </div>
-                    </div>
-                    <!-- Right Column -->
-                    <div>
-                        <div style="margin-bottom: 1rem;">
-                            <div style="font-size: 0.625rem; color: var(--sv-text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">NO. REKAM MEDIS</div>
-                            <div style="font-weight: 600; font-size: 0.875rem; color: var(--sv-text-main);">3578***********0023</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.625rem; color: var(--sv-text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">WAKTU DETEKSI</div>
-                            <div style="font-weight: 600; font-size: 0.875rem; color: var(--sv-text-main);">Kamis, 24 Oktober 2024<br>09:12 WIB</div>
-                        </div>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Pilih Rumah Sakit Rujukan Tujuan</label>
+                    <select class="form-select"><option>Pilih RSUD / Rumah Sakit Terdekat...</option></select>
                 </div>
-
-                <!-- Dropdowns -->
-                <div style="margin-bottom: 1rem;">
-                    <label style="font-size: 0.75rem; color: var(--sv-text-main); font-weight: 600; display: block; margin-bottom: 0.5rem;">Pilih Rumah Sakit Rujukan Tujuan</label>
-                    <select class="form-select" style="font-size: 0.875rem; border: 1px solid var(--sv-border); border-radius: 6px; padding: 0.625rem; width: 100%; color: var(--sv-text-muted);">
-                        <option>Pilih RSUD / Rumah Sakit Terdekat...</option>
-                    </select>
+                <div class="mb-3">
+                    <label class="form-label">Spesialisasi / Poli Tujuan</label>
+                    <select class="form-select"><option>❤ Poli Jantung & Pembuluh Darah</option></select>
                 </div>
-
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="font-size: 0.75rem; color: var(--sv-text-main); font-weight: 600; display: block; margin-bottom: 0.5rem;">Spesialisasi / Poli Tujuan</label>
-                    <select class="form-select" style="font-size: 0.875rem; border: 1px solid var(--sv-border); border-radius: 6px; padding: 0.625rem; width: 100%; color: var(--sv-text-main);">
-                        <option>❤️ Poli Jantung & Pembuluh Darah</option>
-                    </select>
-                </div>
-
-                <!-- Textarea -->
-                <div>
-                    <label style="font-size: 0.75rem; color: var(--sv-text-main); font-weight: 600; display: block; margin-bottom: 0.5rem;">Catatan Tambahan / Diagnosis Sementara Admin</label>
-                    <textarea class="form-control" rows="3" placeholder="Tuliskan instruksi tambahan atau catatan kondisi pasien di sini..." style="font-size: 0.875rem; border: 1px solid var(--sv-border); border-radius: 6px; padding: 0.625rem; width: 100%; resize: vertical;"></textarea>
+                <div class="mb-3">
+                    <label class="form-label">Catatan Tambahan / Diagnosis Sementara Admin</label>
+                    <textarea class="form-control" rows="3" placeholder="Tuliskan instruksi ambulans atau catatan kondisi pasien di sini..."></textarea>
                 </div>
             </div>
-            
-            <!-- Footer Buttons -->
-            <div class="modal-footer" style="padding: 1rem 1.5rem; background-color: white; border-top: 1px solid var(--sv-border); display: flex; justify-content: space-between; align-items: center;">
-                <button type="button" class="btn btn-outline" data-bs-dismiss="modal" style="background: white; border: 1px solid var(--sv-border); padding: 0.625rem 1.5rem; border-radius: 6px; font-weight: 600; color: var(--sv-text-muted); font-size: 0.875rem;">Kembali</button>
-                <button type="button" class="btn" style="background-color: #f97316; color: white; border: none; padding: 0.625rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem;">Proses Rujukan Sekarang >></button>
+            <div class="modal-footer" style="background:var(--sv-bg);">
+                <button type="button" class="sv-filter-btn" data-bs-dismiss="modal">Kembali</button>
+                <button type="button" class="btn btn-warning" style="font-weight:600;">Proses Rujukan Sekarang ➤</button>
             </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.getElementById('globalSearch')?.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            window.location.href = 'cari-pasien.php?q=' + encodeURIComponent(this.value.trim());
-        }
-    });
-</script>
 </body>
 </html>

@@ -8,13 +8,16 @@ use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\RekamMedisController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SearchController;
+use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SettingController;
 
 
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('admin.dashboard');
     }
-    return view('welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -45,6 +48,24 @@ Route::middleware('auth')->group(function () {
     // Profile Routes
     Route::get('/admin/profil', [ProfileController::class, 'index'])->name('admin.profil');
     Route::put('/admin/profil', [ProfileController::class, 'update'])->name('admin.profil.update');
+
+    // Staff Routes
+    Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
+    Route::get('/admin/staff/create', [StaffController::class, 'create'])->name('admin.staff.create');
+    Route::post('/admin/staff', [StaffController::class, 'store'])->name('admin.staff.store');
+    Route::get('/admin/staff/{staff}/edit', [StaffController::class, 'edit'])->name('admin.staff.edit');
+    Route::put('/admin/staff/{staff}', [StaffController::class, 'update'])->name('admin.staff.update');
+    Route::delete('/admin/staff/{staff}', [StaffController::class, 'destroy'])->name('admin.staff.destroy');
+
+    // Report Routes
+    Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
+    Route::get('/admin/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('admin.reports.export-pdf');
+    Route::get('/admin/reports/export-excel', [ReportController::class, 'exportExcel'])->name('admin.reports.export-excel');
+
+    // Settings Routes
+    Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+    Route::post('/admin/settings/profile', [SettingController::class, 'updateProfile'])->name('admin.settings.update-profile');
+    Route::post('/admin/settings/password', [SettingController::class, 'changePassword'])->name('admin.settings.change-password');
 
 });
 

@@ -372,7 +372,7 @@ foreach ($allMonitorings as $m) {
 
         <footer style="padding:20px 24px;border-top:1px solid #E8ECF0;background:#FAFBFC;">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <span style="font-size:12px;color:#8E8E93;">© 2026 SIVISIT — CareVisit Monitor.</span>
+                <span style="font-size:12px;color:#8E8E93;">© 2026 sivisit.</span>
                 <span style="font-size:11px;color:#8E8E93;font-style:italic;">⚠️ Data bersifat simulasi/dummy.</span>
             </div>
         </footer>

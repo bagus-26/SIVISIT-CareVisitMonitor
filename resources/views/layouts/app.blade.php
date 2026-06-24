@@ -41,21 +41,27 @@
                     <i class="bi bi-speedometer2 nav-icon"></i> Dashboard
                 </a>
                 <a href="{{ route('admin.patients.index') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.patients.index') ? 'active' : '' }}">
-                    <i class="bi bi-people nav-icon"></i> Daftar Pasien
+                    class="sv-nav-link {{ request()->routeIs('admin.patients.*') ? 'active' : '' }}">
+                    <i class="bi bi-people nav-icon"></i> Pasien
                 </a>
-                <a href="{{ route('admin.patients.create') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.patients.create') ? 'active' : '' }}">
-                    <i class="bi bi-person-plus nav-icon"></i> Tambah Pasien
+                <a href="{{ route('admin.staff.index') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.staff.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-badge nav-icon"></i> Petugas
                 </a>
                 <a href="{{ route('admin.monitorings.index') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.index') ? 'active' : '' }}">
-                    <i class="bi bi-clipboard2-pulse nav-icon"></i> Data Monitoring
+                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.*') ? 'active' : '' }}">
+                    <i class="bi bi-clipboard2-pulse nav-icon"></i> Kunjungan
                 </a>
-                <a href="{{ route('admin.monitorings.create') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.create') || request()->routeIs('admin.monitorings.show') ? 'active' : '' }}">
-                    <i class="bi bi-pencil-square nav-icon"></i> Catat Monitoring
+                <a href="{{ route('admin.reports.index') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                    <i class="bi bi-bar-chart nav-icon"></i> Laporan
                 </a>
+                <a href="{{ route('admin.settings.index') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                    <i class="bi bi-gear nav-icon"></i> Pengaturan
+                </a>
+
+                <span class="sv-nav-section-label" style="margin-top:12px;">Lainnya</span>
                 <a href="{{ route('admin.rekam-medis.index') }}"
                     class="sv-nav-link {{ request()->routeIs('admin.rekam-medis.*') ? 'active' : '' }}">
                     <i class="bi bi-folder2-open nav-icon"></i> Rekam Medis
@@ -65,10 +71,6 @@
                     <i class="bi bi-search nav-icon"></i> Cari Pasien
                 </a>
 
-                <span class="sv-nav-section-label" style="margin-top:12px;">Sistem</span>
-                <a href="{{ url('/') }}" class="sv-nav-link">
-                    <i class="bi bi-globe2 nav-icon"></i> Beranda
-                </a>
             </nav>
             <div class="sv-sidebar-footer">
                 <a href="{{ route('admin.profil') }}"

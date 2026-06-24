@@ -4,9 +4,22 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/\\');
-$basePath = preg_replace('#/app(?:/.*)?$#', '', $basePath);
-define('API_BASE_URL', $basePath . '/api');
+// Mode standalone: true = frontend only, tanpa backend Laravel
+define('USE_STANDALONE', true);
+
+define('STANDALONE_USERS', [
+    'admin@sivisit.com'   => ['password' => 'Admin123456', 'name' => 'Administrator', 'role' => 'Admin'],
+    'petugas@sivisit.com' => ['password' => 'Petugas123456', 'name' => 'Petugas Monitoring', 'role' => 'Petugas'],
+]);
+
+// Auto-detect backend API URL
+if (!defined('API_BASE_URL')) {
+    if (isset($_SERVER['HTTP_HOST']) && (str_contains($_SERVER['HTTP_HOST'], '8080') || str_contains($_SERVER['HTTP_HOST'], '8000'))) {
+        define('API_BASE_URL', 'http://127.0.0.1:8000/api');
+    } else {
+        define('API_BASE_URL', 'http://localhost/sivisit_SIVISIT-CareVisitMonitor/public/api');
+    }
+}
 
 function initMockData()
 {
@@ -94,67 +107,29 @@ function handleMockAPI($method, $endpoint, $data)
         $path = substr($path, 4);
     }
 
-    if ($path === '/logout' && $method === 'POST') {
-        return [
-            'status_code' => 200,
-            'response' => [
-                'success' => true,
-                'message' => 'Logout berhasil'
-            ]
-        ];
-    }
-
-    if ($path === '/register' && $method === 'POST') {
-        $_SESSION['mock_register_email'] = $data['email'] ?? '';
-        return [
-            'status_code' => 201,
-            'response' => [
-                'success' => true,
-                'message' => 'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.',
-                'user' => [
-                    'id' => rand(100,999),
-                    'name' => $data['name'] ?? '',
-                    'email' => $data['email'] ?? '',
-                ]
-            ]
-        ];
-    }
-
-    if ($path === '/email/resend' && $method === 'POST') {
-        $_SESSION['mock_register_email'] = $data['email'] ?? '';
-        return [
-            'status_code' => 200,
-            'response' => [
-                'success' => true,
-                'message' => 'Email verifikasi telah dikirim ulang. Silakan cek email Anda.'
-            ]
-        ];
-    }
-
     if ($path === '/login' && $method === 'POST') {
         $email = $data['email'] ?? '';
-        $registeredEmail = $_SESSION['mock_register_email'] ?? '';
+        $password = $data['password'] ?? '';
+        $users = STANDALONE_USERS;
 
-        if (!empty($registeredEmail) && $email !== $registeredEmail) {
+        if (!isset($users[$email]) || $users[$email]['password'] !== $password) {
             return [
-                'status_code' => 403,
-                'response' => [
-                    'success' => false,
-                    'verified' => false,
-                    'message' => 'Email belum diverifikasi. Silakan verifikasi email Anda terlebih dahulu.'
-                ]
+                'status_code' => 401,
+                'response' => ['success' => false, 'message' => 'Email atau password salah.']
             ];
         }
+
+        $u = $users[$email];
         return [
             'status_code' => 200,
             'response' => [
                 'success' => true,
-                'access_token' => 'mock_token_123',
+                'access_token' => 'standalone_token_' . md5($email),
                 'user' => [
                     'id' => 1,
-                    'name' => 'Ns. Budi Santoso',
+                    'name' => $u['name'],
                     'email' => $email,
-                    'role' => 'Petugas Kesehatan'
+                    'role' => $u['role'],
                 ]
             ]
         ];
@@ -323,6 +298,10 @@ function handleMockAPI($method, $endpoint, $data)
 
 function callAPI($method, $endpoint, $data = false)
 {
+    if (USE_STANDALONE === true) {
+        return handleMockAPI($method, $endpoint, $data);
+    }
+
     $curl = curl_init();
     $url = API_BASE_URL . $endpoint;
 

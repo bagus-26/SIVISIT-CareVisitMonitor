@@ -1,5 +1,6 @@
 <?php
 require_once '../config.php';
+require_once 'components/ui-config.php';
 
 if (!isset($_SESSION['api_token'])) {
     header("Location: login.php");
@@ -19,13 +20,18 @@ function calculateAge($dob) {
 function getStatusBadge($status) {
     $s = strtolower($status ?? '');
     if (str_contains($s, 'stable') || str_contains($s, 'stabil')) {
-        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
-    } elseif (str_contains($s, 'referral') || str_contains($s, 'rujukan')) {
-        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
+        return '<span class="sv-status-pill stabil">● STABIL</span>';
+    } elseif (str_contains($s, 'referral') || str_contains($s, 'rujukan') || str_contains($s, 'kritis')) {
+        return '<span class="sv-status-pill kritis">● KRITIS</span>';
     } elseif (str_contains($s, 'control') || str_contains($s, 'kontrol')) {
-        return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
+        return '<span class="sv-status-pill kontrol">● PERLU KONTROL</span>';
     }
-    return '<span class="sv-badge" style="background:#F2F4F7;color:#636366;">–</span>';
+    return '<span class="sv-status-pill stabil">● STABIL</span>';
+}
+
+function maskNik($nik) {
+    if (strlen($nik) < 8) return $nik;
+    return substr($nik, 0, 4) . str_repeat('*', max(0, strlen($nik) - 8)) . substr($nik, -4);
 }
 
 function getCategoryBadge($cat) {
@@ -55,10 +61,11 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Pasien — SIVISIT</title>
+    <title>Data Pasien — <?= SV_BRAND_NAME ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
     <link href="table.css" rel="stylesheet">
+    <link href="admin-page.css" rel="stylesheet">
     <link href="modal.css" rel="stylesheet">
     <style>
         .patient-avatar {
@@ -71,42 +78,7 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
             background: #F2F4F7;
             flex-shrink: 0;
         }
-        .search-filter-bar {
-            background: white;
-            border: 1px solid #D8DCE6;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .search-filter-bar input,
-        .search-filter-bar select {
-            border: 1.5px solid #D8DCE6;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 13.5px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            color: #1C1C1E;
-            background: #FAFBFC;
-            transition: all 0.2s;
-        }
-        .search-filter-bar input:focus,
-        .search-filter-bar select:focus {
-            border-color: #007AFF;
-            box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
-            background: white;
-        }
         .search-filter-bar input { flex: 1; min-width: 200px; }
-
-        /* Modal override */
-        .modal-content { border-radius: 16px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
-        .modal-header { border-bottom: 1px solid #F0F2F5; padding: 20px 24px; border-radius: 16px 16px 0 0; }
-        .modal-body { padding: 24px; }
-        .modal-footer { border-top: 1px solid #F0F2F5; padding: 16px 24px; border-radius: 0 0 16px 16px; }
 
         .detail-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid #F2F4F7; }
         .detail-row:last-child { border-bottom: none; }
@@ -123,22 +95,7 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
     <?php require_once 'components/sidebar.php'; ?>
 
     <div class="sv-main">
-        <!-- Topbar -->
-        <div class="sv-topbar">
-            <div class="sv-topbar-search">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="Cari pasien, NIK, atau kode pasien..." id="globalSearch" autocomplete="off">
-            </div>
-            <div class="sv-topbar-right">
-                <div class="sv-user-info">
-                    <div class="user-text">
-                        <div class="user-name"><?= $userName ?></div>
-                        <div class="user-role"><?= $userEmail ?></div>
-                    </div>
-                    <div class="sv-avatar"><?= $userInitial ?></div>
-                </div>
-            </div>
-        </div>
+        <?php $searchPlaceholder = 'Cari nama pasien, kode, atau NIK...'; require_once 'components/topbar.php'; ?>
 
         <!-- Content -->
         <div class="sv-content">
@@ -159,75 +116,75 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
                     </div>
                 <?php endif; ?>
             <?php endif; ?>
-            <!-- Page Header -->
             <div class="sv-page-header sv-animate-in">
                 <div>
-                    <h1>Daftar Pasien Binaan</h1>
-                    <p>Total <strong><?= count($patients) ?></strong> pasien terdaftar dalam sistem.</p>
+                    <h1>Data Pasien</h1>
+                    <p>Kelola seluruh data pasien home care yang terdaftar di sistem.</p>
                 </div>
-                <a href="tambah-pasien.php" class="btn btn-primary">➕ Tambah Pasien Baru</a>
             </div>
 
-            <!-- Search & Filter -->
-            <div class="search-filter-bar sv-animate-in">
-                <span style="font-size:13px;font-weight:600;color:#636366;white-space:nowrap;">Filter:</span>
-                <input type="text" id="searchInput" placeholder="🔍 Cari nama, NIK, kode pasien...">
-                <select id="categoryFilter">
-                    <option value="">Semua Kategori</option>
-                    <option value="lansia">🧓 Lansia</option>
-                    <option value="hipertensi">❤️ Hipertensi</option>
-                    <option value="diabetes">🩸 Diabetes</option>
-                    <option value="pasca rawat">🏥 Pasca Rawat</option>
-                    <option value="lainnya">📋 Lainnya</option>
-                </select>
-                <select id="statusFilter">
-                    <option value="">Semua Status</option>
-                    <option value="stabil">✅ Stabil</option>
-                    <option value="kontrol">⚠️ Perlu Kontrol</option>
-                    <option value="rujukan">🚨 Perlu Rujukan</option>
-                </select>
+            <div class="mb-4 sv-animate-in">
+                <button type="button" class="btn btn-primary" style="font-weight:600;" data-bs-toggle="modal" data-bs-target="#modalTambahPasien">
+                    + Tambah Pasien Baru
+                </button>
             </div>
 
-            <!-- Table -->
             <div class="sv-table-wrap sv-animate-in">
-                <div class="sv-section-header">
-                    <h5>📋 Semua Pasien</h5>
-                    <span style="font-size:12px;color:#8E8E93;" id="rowCount"><?= count($patients) ?> pasien</span>
+                <div class="sv-filter-bar">
+                    <input type="search" class="sv-filter-search" id="searchInput" placeholder="Cari Kode atau Nama...">
+                    <select class="sv-filter-select" id="categoryFilter">
+                        <option value="">Semua Kategori</option>
+                        <option value="lansia">Lansia</option>
+                        <option value="hipertensi">Hipertensi</option>
+                        <option value="diabetes">Diabetes</option>
+                        <option value="pasca rawat">Pasca Rawat</option>
+                    </select>
+                    <select class="sv-filter-select" id="statusFilter">
+                        <option value="">Semua Status</option>
+                        <option value="stable">Stabil</option>
+                        <option value="control">Perlu Kontrol</option>
+                        <option value="referral">Kritis</option>
+                    </select>
+                    <button type="button" class="sv-filter-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        Filter Lanjutan
+                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table mb-0" id="patientTable">
                         <thead>
                             <tr>
-                                <th style="width:40px;">No</th>
-                                <th>Pasien</th>
-                                <th>Kode / NIK</th>
-                                <th>Usia</th>
+                                <th>Kode Pasien</th>
+                                <th>Nama Pasien</th>
+                                <th>NIK</th>
+                                <th>Tgl Lahir</th>
+                                <th>JK</th>
+                                <th>Alamat</th>
+                                <th>HP Keluarga</th>
                                 <th>Kategori</th>
-                                <th>Status Terakhir</th>
-                                <th>Kontak Keluarga</th>
-                                <th style="text-align:right;">Aksi</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="patientBody">
                             <?php if (empty($patients)): ?>
                                 <tr>
-                                    <td colspan="8">
+                                    <td colspan="10">
                                         <div class="sv-empty-state">
                                             <div class="empty-icon">👥</div>
-                                            <p>Belum ada data pasien. <a href="tambah-pasien.php">Tambah pasien pertama →</a></p>
+                                            <p>Belum ada data pasien. <a href="#" data-bs-toggle="modal" data-bs-target="#modalTambahPasien">Tambah pasien pertama →</a></p>
                                         </div>
                                     </td>
                                 </tr>
                             <?php else: ?>
-                                <?php $no = 1; foreach ($patients as $p):
-                                    // Get latest monitoring status
+                                <?php foreach ($patients as $p):
                                     $latestStatus = '';
                                     if (!empty($p['monitorings'])) {
                                         $mons = $p['monitorings'];
                                         usort($mons, fn($a,$b) => strtotime($b['monitoring_date'] ?? '') <=> strtotime($a['monitoring_date'] ?? ''));
                                         $latestStatus = $mons[0]['status'] ?? '';
                                     }
-                                    $gender = ($p['gender'] ?? '') === 'Male' ? '👨' : '👩';
+                                    $jk = ($p['gender'] ?? '') === 'Male' ? 'L' : 'P';
                                 ?>
                                 <tr
                                     data-name="<?= strtolower($p['patient_name'] ?? '') ?>"
@@ -236,31 +193,18 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
                                     data-category="<?= strtolower($p['patient_category'] ?? '') ?>"
                                     data-status="<?= strtolower($latestStatus) ?>"
                                 >
-                                    <td style="color:#8E8E93;"><?= $no++ ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="patient-avatar"><?= $gender ?></div>
-                                            <div>
-                                                <div style="font-weight:600;font-size:13.5px;"><?= htmlspecialchars($p['patient_name'] ?? '-') ?></div>
-                                                <div style="font-size:11px;color:#8E8E93;"><?= htmlspecialchars($p['address'] ?? '-') ?></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style="font-size:12px;font-weight:600;color:#007AFF;"><?= htmlspecialchars($p['patient_id'] ?? '-') ?></div>
-                                        <div style="font-size:11px;color:#8E8E93;">NIK: <?= htmlspecialchars($p['nik_dummy'] ?? '-') ?></div>
-                                    </td>
-                                    <td style="font-weight:500;"><?= calculateAge($p['datebirth'] ?? '') ?></td>
+                                    <td><span class="sv-code-link"><?= htmlspecialchars($p['patient_id'] ?? '-') ?></span></td>
+                                    <td style="font-weight:600;"><?= htmlspecialchars($p['patient_name'] ?? '-') ?></td>
+                                    <td style="color:#636366;font-size:12.5px;"><?= maskNik($p['nik_dummy'] ?? '-') ?></td>
+                                    <td style="font-size:12.5px;"><?= isset($p['datebirth']) ? date('d/m/Y', strtotime($p['datebirth'])) : '-' ?></td>
+                                    <td><?= $jk ?></td>
+                                    <td style="font-size:12px;max-width:160px;"><?= htmlspecialchars($p['address'] ?? '-') ?></td>
+                                    <td style="font-size:12.5px;"><?= htmlspecialchars($p['family_phone'] ?? '-') ?></td>
                                     <td><?= getCategoryBadge($p['patient_category'] ?? '-') ?></td>
                                     <td><?= getStatusBadge($latestStatus) ?></td>
-                                    <td style="font-size:13px;color:#636366;"><?= htmlspecialchars($p['family_phone'] ?? '-') ?></td>
-                                    <td style="text-align:right;">
-                                        <button
-                                            class="btn btn-sm btn-outline-primary"
-                                            style="font-size:12px;"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalPasien<?= htmlspecialchars($p['patient_id']) ?>"
-                                        >Detail</button>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" style="font-size:11px;margin-right:4px;" data-bs-toggle="modal" data-bs-target="#modalPasien<?= htmlspecialchars($p['patient_id']) ?>">Edit</button>
+                                        <a href="edit-pasien.php?id=<?= urlencode($p['patient_id']) ?>" class="btn btn-sm btn-outline-danger" style="font-size:11px;">Hapus</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -268,15 +212,81 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
                         </tbody>
                     </table>
                 </div>
+
+                <div class="sv-pagination-bar">
+                    <div class="sv-pagination-text">Menampilkan 1–<?= count($patients) ?> dari <?= max(count($patients), 24) ?> data · <?= svDummyFooter() ?></div>
+                    <div class="sv-pagination-nav">
+                        <span class="sv-page-btn disabled">&lt;</span>
+                        <a href="#" class="sv-page-btn active">1</a>
+                        <a href="#" class="sv-page-btn">2</a>
+                        <a href="#" class="sv-page-btn">3</a>
+                        <a href="#" class="sv-page-btn">&gt;</a>
+                    </div>
+                </div>
+            </div>
+
+            <?php require_once 'components/admin-footer.php'; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Pasien Baru -->
+<div class="modal fade" id="modalTambahPasien" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title" style="font-weight:800;">👤+ Tambah Pasien Baru</h5>
+                    <p style="font-size:12px;color:var(--sv-text-muted);margin:4px 0 0;">Pendaftaran pasien baru sistem <?= SV_BRAND_NAME ?></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info py-2 px-3" style="font-size:12.5px;border-radius:10px;">
+                    ℹ Pastikan seluruh data yang dimasukkan adalah data dummy/simulasi untuk keperluan pelatihan dan monitoring.
+                </div>
+                <form action="tambah-pasien.php" method="GET">
+                    <div class="mb-3">
+                        <label class="form-label">Kode Pasien</label>
+                        <input type="text" class="form-control" value="CVP-005" readonly style="background:#F2F4F7;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Pasien</label>
+                        <input type="text" class="form-control" placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label">NIK Dummy</label>
+                            <span style="font-size:11px;color:var(--sv-text-muted);">16 DIGIT</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Contoh: 3275000000000001" maxlength="16">
+                        <small style="color:var(--sv-text-muted);">Gunakan format 16 digit angka simulasi untuk verifikasi sistem.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Lahir</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label d-block">Jenis Kelamin</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="gender" id="jkL" value="Male" checked>
+                            <label class="form-check-label" for="jkL">Laki-laki</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="gender" id="jkP" value="Female">
+                            <label class="form-check-label" for="jkP">Perempuan</label>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <button type="button" class="sv-filter-btn" data-bs-dismiss="modal">Batal</button>
+                        <a href="tambah-pasien.php" class="btn btn-primary" style="font-weight:600;">💾 Simpan Pasien</a>
+                    </div>
+                </form>
+            </div>
+            <div class="text-center pb-3" style="font-size:10px;font-weight:700;color:var(--sv-text-muted);letter-spacing:1px;">
+                ( DATA DUMMY / SIMULASI )
             </div>
         </div>
-
-        <footer style="padding:20px 24px;border-top:1px solid #E8ECF0;background:#FAFBFC;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                <span style="font-size:12px;color:#8E8E93;">© 2026 SIVISIT — CareVisit Monitor.</span>
-                <span style="font-size:11px;color:#8E8E93;font-style:italic;">⚠️ Data bersifat simulasi/dummy.</span>
-            </div>
-        </footer>
     </div>
 </div>
 
@@ -438,19 +448,15 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
             if (show) visible++;
         });
 
-        rowCount.textContent = visible + ' pasien';
+        rowCount?.textContent && (rowCount.textContent = visible + ' pasien');
+        const fc = document.getElementById('filterCount');
+        if (fc) fc.textContent = visible + ' dari ' + rows.length + ' ditampilkan';
     }
 
+    filterTable();
     searchInput.addEventListener('input', filterTable);
     categoryFilter.addEventListener('change', filterTable);
     statusFilter.addEventListener('change', filterTable);
-
-    // Global search redirect
-    document.getElementById('globalSearch').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            window.location.href = 'cari-pasien.php?q=' + encodeURIComponent(this.value.trim());
-        }
-    });
 </script>
 </body>
 </html>

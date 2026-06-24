@@ -71,6 +71,7 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
     <title>Edit Pasien — SIVISIT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
+    <link href="globals.css" rel="stylesheet">
     <style>
         .form-section {
             background: white;
@@ -267,7 +268,7 @@ $userEmail   = htmlspecialchars($user['email'] ?? '');
         </div>
 
         <footer style="padding:20px 24px;border-top:1px solid #E8ECF0;background:#FAFBFC;">
-            <span style="font-size:12px;color:#8E8E93;">© 2026 SIVISIT — CareVisit Monitor.</span>
+            <span style="font-size:12px;color:#8E8E93;">© 2026 sivisit.</span>
         </footer>
     </div>
 </div>

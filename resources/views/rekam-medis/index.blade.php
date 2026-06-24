@@ -124,7 +124,6 @@
                             <div style="font-size:11.5px;color:var(--sv-text-muted);margin-top:6px;line-height:1.5;">
                                 <i class="bi bi-chat-text"></i> {{ Str::limit($mon->symptoms, 80) }}
                             </div>
-                            @endif
                         </div>
                         <div style="text-align:right;flex-shrink:0;">
                             <span class="sv-badge" style="{{ $lblColors[$mCls] }}">{{ $mLbl }}</span>

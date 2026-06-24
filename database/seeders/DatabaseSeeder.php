@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Jalankan AdminSeeder untuk membuat kredensial admin dan petugas
+        $this->call(AdminSeeder::class);
+
         $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admincarevisit@2026.dev',

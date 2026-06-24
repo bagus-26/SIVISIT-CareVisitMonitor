@@ -1,11 +1,17 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 
+@php
+    $greetingHour = (int) date('G');
+    $greeting = $greetingHour < 12 ? 'Selamat Pagi' : ($greetingHour < 15 ? 'Selamat Siang' : ($greetingHour < 18 ? 'Selamat Sore' : 'Selamat Malam'));
+@endphp
+
 @section('content')
+{{-- Greeting --}}
 <div class="sv-page-header sv-animate-in">
     <div>
-        <h1>Selamat Datang, {{ Auth::user()->name ?? 'Petugas' }}</h1>
-        <p>Ringkasan kondisi pasien home care hari ini, {{ now()->translatedFormat('d F Y') }}.</p>
+        <h1>{{ $greeting }}, {{ Auth::user()->name ?? 'Petugas' }}</h1>
+        <p>Berikut adalah ringkasan operasional klinis hari ini, {{ now()->translatedFormat('l, d F Y') }}.</p>
     </div>
     <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">
         <i class="bi bi-person-plus me-1"></i> Tambah Pasien
@@ -17,41 +23,42 @@
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-1">
         <div class="sv-stat-card" style="--accent-color:#007AFF;">
             <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-            <div class="stat-label">Total Pasien</div>
+            <div class="stat-label">Total Pasien Binaan</div>
             <div class="stat-value" style="color:#007AFF;">{{ $totalPatients }}</div>
-            <div class="stat-sub">Pasien terdaftar</div>
+            <div class="stat-sub">{{ $todayVisits }} kunjungan hari ini</div>
         </div>
     </div>
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-2">
-        <div class="sv-stat-card" style="--accent-color:#FF9500;">
-            <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
-            <div class="stat-label">Kunjungan Hari Ini</div>
-            <div class="stat-value" style="color:#FF9500;">{{ $todayVisits }}</div>
-            <div class="stat-sub">Monitoring tercatat</div>
+        <div class="sv-stat-card" style="--accent-color:#34C759;">
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-label">Monitoring Selesai</div>
+            <div class="stat-value" style="color:#34C759;">{{ $todayFinished }}</div>
+            <div class="stat-sub">Status stabil hari ini</div>
         </div>
     </div>
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-3">
-        <div class="sv-stat-card" style="--accent-color:#FF3B30;">
+        <div class="sv-stat-card" style="--accent-color:#FF9500;">
             <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div class="stat-label">Perlu Kontrol</div>
-            <div class="stat-value" style="color:#FF3B30;">{{ $needControl }}</div>
+            <div class="stat-value" style="color:#FF9500;">{{ $needControl }}</div>
             <div class="stat-sub">Butuh tindak lanjut</div>
         </div>
     </div>
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-4">
-        <div class="sv-stat-card" style="--accent-color:#34C759;">
-            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
-            <div class="stat-label">Status Stabil</div>
-            <div class="stat-value" style="color:#34C759;">{{ $todayFinished }}</div>
-            <div class="stat-sub">Selesai hari ini</div>
+        <div class="sv-stat-card" style="--accent-color:#FF3B30;">
+            <div class="stat-icon"><i class="bi bi-hospital-fill"></i></div>
+            <div class="stat-label">Perlu Rujukan</div>
+            <div class="stat-value" style="color:#FF3B30;">{{ $needReferral }}</div>
+            <div class="stat-sub">Emergency action required</div>
         </div>
     </div>
 </div>
 
 <div class="row g-3">
-    {{-- Agenda Hari Ini --}}
-    <div class="col-12 col-xl-8 sv-animate-in">
-        <div class="sv-table-wrap">
+    {{-- Left: Agenda + Chart --}}
+    <div class="col-12 col-xl-8 d-flex flex-column gap-3">
+        {{-- Agenda Hari Ini --}}
+        <div class="sv-table-wrap sv-animate-in">
             <div class="sv-section-header">
                 <h5><i class="bi bi-calendar3 me-2" style="color:var(--sv-blue);"></i>Agenda Kunjungan Hari Ini</h5>
                 <a href="{{ route('admin.monitorings.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
@@ -104,11 +111,67 @@
                 </tbody>
             </table>
         </div>
+
+        {{-- Chart: Tren Kunjungan Harian --}}
+        <div class="sv-card sv-animate-in" style="padding:20px 24px;">
+            <h5 style="font-size:15px;font-weight:600;margin:0 0 4px;">Tren Kunjungan Harian</h5>
+            <p style="font-size:12px;color:#8E8E93;margin:0 0 16px;">Rekapitulasi 7 hari terakhir</p>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px;">
+                @foreach($weeklyVisits as $i => $v)
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                    <div style="width:100%;background:#007AFF;border-radius:6px 6px 0 0;height:{{ max(round(($v / $maxWeekly) * 100), 4) }}%;min-height:4px;transition:height 0.4s;" title="{{ $v }} kunjungan"></div>
+                    <span style="font-size:10px;color:#8E8E93;">{{ $dayLabels[$i] }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
     </div>
 
-    {{-- Quick Actions --}}
-    <div class="col-12 col-xl-4 sv-animate-in">
-        <div class="sv-card h-100">
+    {{-- Right: Patient Monitoring + Quick Actions --}}
+    <div class="col-12 col-xl-4 d-flex flex-column gap-3">
+        {{-- Pemantauan Pasien --}}
+        <div class="sv-table-wrap sv-animate-in" style="padding:0;">
+            <div class="sv-section-header">
+                <h5><i class="bi bi-heart-pulse me-2" style="color:var(--sv-blue);"></i>Pemantauan Pasien</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <tbody>
+                        @forelse($monitorPatients as $mp)
+                        <tr>
+                            <td style="width:44px;">
+                                <div style="width:32px;height:32px;border-radius:50%;background:{{ $mp->color }};display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700;">
+                                    {{ strtoupper(substr($mp->name, 0, 1)) }}
+                                </div>
+                            </td>
+                            <td style="font-weight:600;font-size:13.5px;">{{ $mp->name }}</td>
+                            <td style="text-align:right;">
+                                @php $s = strtolower($mp->status ?? ''); @endphp
+                                @if(str_contains($s,'stable') || str_contains($s,'stabil'))
+                                    <span class="sv-badge sv-badge-stable">Stabil</span>
+                                @elseif(str_contains($s,'referral') || str_contains($s,'rujukan'))
+                                    <span class="sv-badge sv-badge-referral">Kritis</span>
+                                @else
+                                    <span class="sv-badge sv-badge-control">Beresiko</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3">
+                                <div class="sv-empty-state" style="padding:16px;">
+                                    <p style="margin:0;font-size:13px;">Belum ada data monitoring.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Quick Actions --}}
+        <div class="sv-card sv-animate-in">
             <h5 style="font-size:15px;font-weight:600;margin-bottom:6px;">
                 <i class="bi bi-search me-2" style="color:var(--sv-blue);"></i>Cari Pasien Cepat
             </h5>

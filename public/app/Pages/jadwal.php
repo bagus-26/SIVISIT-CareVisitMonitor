@@ -62,7 +62,7 @@ function calculateAge($dob) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal & Pencarian Pasien — MediaAdmin</title>
+    <title>Jadwal & Pencarian Pasien — sivisit</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="globals.css" rel="stylesheet">
     <link href="table.css" rel="stylesheet">
@@ -868,7 +868,7 @@ function calculateAge($dob) {
     <footer class="sv-footer" id="kontak">
         <div class="sv-footer-container">
             <div>
-                © 2026 MediaAdmin. Data encrypted (AES-256). ISO 27001 Certified.
+                © 2026 sivisit. Data encrypted (AES-256). ISO 27001 Certified.
             </div>
             <div class="sv-footer-links">
                 <a href="#accessibility">Accessibility</a>

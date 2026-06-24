@@ -1,1 +1,135 @@
-@import url('global.css');
+/* SIVISIT — Modals (Mockup UI) */
+
+.sv-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 22, 40, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.sv-modal-backdrop.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+
+.sv-modal {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+    animation: fadeInUp 0.3s ease;
+    overflow: hidden;
+}
+
+.sv-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--sv-border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sv-modal-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sv-navy);
+    flex: 1;
+}
+
+.sv-modal-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.sv-modal-icon.warning {
+    background: var(--sv-red-light);
+    color: var(--sv-red);
+}
+
+.sv-modal-icon.info {
+    background: var(--sv-blue-light);
+    color: var(--sv-blue);
+}
+
+.sv-modal-body {
+    padding: 20px 24px;
+    font-size: 14px;
+    color: var(--sv-text-sub);
+    line-height: 1.6;
+}
+
+.sv-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--sv-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: var(--sv-bg);
+}
+
+.sv-modal-footer .btn-cancel {
+    padding: 9px 18px;
+    border: 1px solid var(--sv-border);
+    background: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-text-sub);
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--sv-transition);
+}
+
+.sv-modal-footer .btn-cancel:hover { background: var(--sv-bg); }
+
+.sv-modal-footer .btn-confirm {
+    padding: 9px 18px;
+    border: none;
+    background: var(--sv-red);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--sv-transition);
+}
+
+.sv-modal-footer .btn-confirm.primary {
+    background: var(--sv-blue);
+}
+
+.sv-modal-footer .btn-confirm:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Bootstrap modal override */
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--sv-border);
+    padding: 20px 24px;
+}
+
+.modal-body { padding: 24px; }
+
+.modal-footer {
+    border-top: 1px solid var(--sv-border);
+    padding: 16px 24px;
+    background: var(--sv-bg);
+}

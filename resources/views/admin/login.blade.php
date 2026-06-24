@@ -501,14 +501,7 @@
                 </div>
             </div>
 
-            <div class="lf-footer-link">
-                <a href="{{ url('/') }}">
-                    <i class="bi bi-arrow-left"></i> Kembali ke Beranda
-                </a>
-            </div>
-
         </div>
-    </div>
 
 </div>
 
