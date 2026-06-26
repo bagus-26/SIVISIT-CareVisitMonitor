@@ -34,7 +34,12 @@
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
+            @php
+                $isAdmin = Auth::user()->role === 'admin';
+            @endphp
+
             <nav class="sv-sidebar-nav">
+                @if($isAdmin)
                 <span class="sv-nav-section-label">Menu Utama</span>
                 <a href="{{ route('admin.dashboard') }}"
                     class="sv-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -70,7 +75,29 @@
                     class="sv-nav-link {{ request()->routeIs('admin.patients.search') ? 'active' : '' }}">
                     <i class="bi bi-search nav-icon"></i> Cari Pasien
                 </a>
-
+                @else
+                <span class="sv-nav-section-label">Menu Petugas</span>
+                <a href="{{ route('admin.monitorings.index') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.*') ? 'active' : '' }}">
+                    <i class="bi bi-clipboard2-pulse nav-icon"></i> Kunjungan
+                </a>
+                <a href="{{ route('admin.monitorings.create') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.create') ? 'active' : '' }}">
+                    <i class="bi bi-pencil-square nav-icon"></i> Catat Monitoring
+                </a>
+                <a href="{{ route('admin.patients.index') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.patients.*') ? 'active' : '' }}">
+                    <i class="bi bi-people nav-icon"></i> Pasien
+                </a>
+                <a href="{{ route('admin.rekam-medis.index') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.rekam-medis.*') ? 'active' : '' }}">
+                    <i class="bi bi-folder2-open nav-icon"></i> Rekam Medis
+                </a>
+                <a href="{{ route('admin.patients.search') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.patients.search') ? 'active' : '' }}">
+                    <i class="bi bi-search nav-icon"></i> Cari Pasien
+                </a>
+                @endif
             </nav>
             <div class="sv-sidebar-footer">
                 <a href="{{ route('admin.profil') }}"
@@ -84,6 +111,9 @@
                         </div>
                         <div style="font-size:10px;color:var(--sv-sidebar-txt);opacity:.7;">
                             {{ Auth::user()->email ?? '' }}
+                        </div>
+                        <div style="font-size:9px;color:var(--sv-sidebar-txt);opacity:.5;margin-top:1px;">
+                            {{ $isAdmin ? 'Administrator' : 'Petugas' }}
                         </div>
                     </div>
                     <i class="bi bi-pencil" style="font-size:10px;color:var(--sv-sidebar-txt);opacity:.5;"></i>
@@ -112,7 +142,7 @@
                     <a href="{{ route('admin.profil') }}" class="sv-user-info text-decoration-none">
                         <div class="user-text d-none d-sm-block">
                             <div class="user-name">{{ Auth::user()->name ?? 'Petugas' }}</div>
-                            <div class="user-role">{{ Auth::user()->email ?? '' }}</div>
+                            <div class="user-role">{{ $isAdmin ? 'Administrator' : 'Petugas' }}</div>
                         </div>
                         <div class="sv-avatar">{{ strtoupper(substr(Auth::user()->name ?? 'P', 0, 1)) }}</div>
                     </a>

@@ -8,6 +8,26 @@ use Illuminate\Http\Request;
 
 class MonitoringController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = Monitoring::with([
+            'patient',
+            'user' => fn($q) => $q->select('id', 'name', 'email'),
+        ])->latest('monitoring_date')->latest('monitoring_time');
+
+        if ($patientId = $request->query('patient_id')) {
+            $query->where('patient_id', $patientId);
+        }
+
+        $monitorings = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data monitoring berhasil diambil.',
+            'data'    => $monitorings,
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

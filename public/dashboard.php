@@ -424,6 +424,7 @@ $current_time = date('H:i:s');
 
             <ul class="sidebar-menu">
                 <li><a href="dashboard.php" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="lokasi.php"><i class="bi bi-geo-alt"></i> Monitoring Lokasi</a></li>
                 <li><a href="#pasien"><i class="bi bi-people"></i> Pasien</a></li>
                 <li><a href="#petugas"><i class="bi bi-person-badge"></i> Petugas</a></li>
                 <li><a href="#kunjungan"><i class="bi bi-calendar-check"></i> Kunjungan</a></li>
@@ -515,6 +516,10 @@ $current_time = date('H:i:s');
                     <a href="#" class="menu-button laporan" data-bs-toggle="modal" data-bs-target="#laporanModal">
                         <i class="bi bi-bar-chart"></i>
                         Laporan
+                    </a>
+                    <a href="lokasi.php" class="menu-button" style="background:linear-gradient(135deg,#00B4DB,#0099CC);">
+                        <i class="bi bi-geo-alt"></i>
+                        Monitoring Lokasi
                     </a>
                     <a href="#" class="menu-button pengaturan" data-bs-toggle="modal" data-bs-target="#pengaturanModal">
                         <i class="bi bi-gear"></i>
@@ -652,6 +657,10 @@ $current_time = date('H:i:s');
         </div>
     </div>
 
+    <div style="padding:20px 30px;border-top:1px solid #D8DCE6;text-align:center;color:#8E8E93;font-size:12px;background:white;margin-left:250px;">
+        <p style="margin:0 0 4px;">Sivisit-Kelompok 9 S1 Informatika UAS Pemrograman WEB ITSK Rs Dr Soepraoen Malang</p>
+        <p style="margin:0;font-style:italic;">&#x26A0;&#xFE0F; Data simulasi/dummy. Tidak memberikan diagnosis medis. Rekomendasi hanya tindak lanjut administratif.</p>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

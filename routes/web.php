@@ -15,6 +15,10 @@ use App\Http\Controllers\Admin\SettingController;
 
 Route::get('/', function () {
     if (auth()->check()) {
+        $user = auth()->user();
+        if ($user->role === 'petugas') {
+            return redirect()->route('admin.monitorings.index');
+        }
         return redirect()->route('admin.dashboard');
     }
     return redirect()->route('login');
@@ -27,7 +31,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Patient Routes
+    // Patient Routes — all roles can access
     Route::get('/admin/patients', [PatientController::class, 'index'])->name('admin.patients.index');
     Route::get('/admin/patients/create', [PatientController::class, 'create'])->name('admin.patients.create');
     Route::post('/admin/patients', [PatientController::class, 'store'])->name('admin.patients.store');
@@ -36,37 +40,39 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/patients/{patient_id}', [PatientController::class, 'destroy'])->name('admin.patients.destroy');
     Route::get('/admin/search', [SearchController::class, 'index'])->name('admin.patients.search');
 
-    // Monitoring Routes
+    // Monitoring Routes — all roles can access
     Route::get('/admin/monitorings', [MonitoringController::class, 'index'])->name('admin.monitorings.index');
     Route::get('/admin/monitorings/create', [MonitoringController::class, 'create'])->name('admin.monitorings.create');
     Route::post('/admin/monitorings', [MonitoringController::class, 'store'])->name('admin.monitorings.store');
     Route::get('/admin/monitorings/{id}', [MonitoringController::class, 'show'])->name('admin.monitorings.show');
 
-    // Rekam Medis Routes
+    // Rekam Medis Routes — all roles can access
     Route::get('/admin/rekam-medis', [RekamMedisController::class, 'index'])->name('admin.rekam-medis.index');
 
-    // Profile Routes
+    // Profile Routes — all roles can access
     Route::get('/admin/profil', [ProfileController::class, 'index'])->name('admin.profil');
     Route::put('/admin/profil', [ProfileController::class, 'update'])->name('admin.profil.update');
 
-    // Staff Routes
-    Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
-    Route::get('/admin/staff/create', [StaffController::class, 'create'])->name('admin.staff.create');
-    Route::post('/admin/staff', [StaffController::class, 'store'])->name('admin.staff.store');
-    Route::get('/admin/staff/{staff}/edit', [StaffController::class, 'edit'])->name('admin.staff.edit');
-    Route::put('/admin/staff/{staff}', [StaffController::class, 'update'])->name('admin.staff.update');
-    Route::delete('/admin/staff/{staff}', [StaffController::class, 'destroy'])->name('admin.staff.destroy');
+    // Admin-only routes
+    Route::middleware('role:admin')->group(function () {
+        // Staff Routes
+        Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
+        Route::get('/admin/staff/create', [StaffController::class, 'create'])->name('admin.staff.create');
+        Route::post('/admin/staff', [StaffController::class, 'store'])->name('admin.staff.store');
+        Route::get('/admin/staff/{staff}/edit', [StaffController::class, 'edit'])->name('admin.staff.edit');
+        Route::put('/admin/staff/{staff}', [StaffController::class, 'update'])->name('admin.staff.update');
+        Route::delete('/admin/staff/{staff}', [StaffController::class, 'destroy'])->name('admin.staff.destroy');
 
-    // Report Routes
-    Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
-    Route::get('/admin/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('admin.reports.export-pdf');
-    Route::get('/admin/reports/export-excel', [ReportController::class, 'exportExcel'])->name('admin.reports.export-excel');
+        // Report Routes
+        Route::get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports.index');
+        Route::get('/admin/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('admin.reports.export-pdf');
+        Route::get('/admin/reports/export-excel', [ReportController::class, 'exportExcel'])->name('admin.reports.export-excel');
 
-    // Settings Routes
-    Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
-    Route::post('/admin/settings/profile', [SettingController::class, 'updateProfile'])->name('admin.settings.update-profile');
-    Route::post('/admin/settings/password', [SettingController::class, 'changePassword'])->name('admin.settings.change-password');
-
+        // Settings Routes
+        Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('/admin/settings/profile', [SettingController::class, 'updateProfile'])->name('admin.settings.update-profile');
+        Route::post('/admin/settings/password', [SettingController::class, 'changePassword'])->name('admin.settings.change-password');
+    });
 });
 
 

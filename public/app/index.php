@@ -133,7 +133,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
         <a href="Pages/about.php">Tentang</a>
         <a href="Pages/jadwal.php">Cek Jadwal</a>
         <a href="#kontak">Kontak</a>
-        <a href="Pages/login.php" class="btn-nav-cta">Masuk Admin</a>
+        <a href="Pages/jadwal.php" class="btn-nav-cta">Cek Jadwal</a>
     </nav>
     <button class="landing-burger" id="burgerBtn" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -145,7 +145,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
     <a href="Pages/about.php">Tentang Kami</a>
     <a href="Pages/jadwal.php">Cek Jadwal</a>
     <a href="#kontak">Kontak</a>
-    <a href="Pages/login.php">Masuk Admin</a>
+            <a href="Pages/jadwal.php">Cek Jadwal</a>
 </div>
 
 <section class="landing-hero">
@@ -156,8 +156,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
             Platform digital untuk petugas kesehatan dalam memantau dan mencatat kondisi pasien binaan secara terstruktur, transparan, dan real-time.
         </p>
         <div class="landing-hero-actions">
-            <a href="Pages/login.php" class="landing-btn-primary">Masuk ke Dashboard →</a>
-            <a href="Pages/jadwal.php" class="landing-btn-schedule">Cek Jadwal Pasien</a>
+            <a href="Pages/jadwal.php" class="landing-btn-primary">Cek Jadwal & Riwayat →</a>
             <a href="Pages/about.php" class="landing-btn-outline">Pelajari Lebih Lanjut</a>
         </div>
     </div>
@@ -241,8 +240,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
     <h2>Siap Memulai Monitoring?</h2>
     <p>Akses dashboard petugas atau cek jadwal kunjungan pasien Anda sekarang.</p>
     <div class="landing-hero-actions" style="justify-content:center;">
-        <a href="Pages/login.php" class="landing-btn-primary">Login Petugas</a>
-        <a href="Pages/jadwal.php" class="landing-btn-outline" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.3);">Cek Jadwal Publik</a>
+        <a href="Pages/jadwal.php" class="landing-btn-primary">Cek Jadwal & Riwayat →</a>
     </div>
 </section>
 
@@ -257,13 +255,11 @@ if (session_status() === PHP_SESSION_NONE) session_start();
             <a href="index.php">Beranda</a>
             <a href="Pages/about.php">Tentang Kami</a>
             <a href="Pages/jadwal.php">Cek Jadwal</a>
-            <a href="Pages/login.php">Masuk Admin</a>
+            <a href="Pages/jadwal.php">Cek Jadwal</a>
         </div>
         <div class="landing-footer-col">
             <h4>Layanan Publik</h4>
-            <a href="Pages/lansia-pascarawat.php">Lansia Pasca Rawat</a>
-            <a href="Pages/hipertensi-diabetes.php">Hipertensi & Diabetes</a>
-            <a href="Pages/jadwal.php">Pencarian Jadwal</a>
+            <a href="Pages/jadwal.php">Pencarian Riwayat Pasien</a>
         </div>
         <div class="landing-footer-col">
             <h4>Kontak</h4>
@@ -272,8 +268,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
         </div>
     </div>
     <div class="landing-footer-bottom">
-        <span>© 2026 sivisit. Data bersifat simulasi.</span>
-        <span>ISO 27001 · AES-256 Encrypted</span>
+        <span>Sivisit-Kelompok 9 S1 Informatika UAS Pemrograman WEB ITSK Rs Dr Soepraoen Malang — Data simulasi, bukan diagnosis medis.</span>
     </div>
 </footer>
 

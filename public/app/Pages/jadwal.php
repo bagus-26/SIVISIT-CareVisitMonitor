@@ -1,59 +1,33 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
 require '../config.php';
 
 $query = trim($_GET['q'] ?? '');
-$categoryFilter = $_GET['category'] ?? '';
 $result = null;
 $error = '';
+$connectionError = '';
 $history = [];
 
 if (!empty($query)) {
-    // Hit Laravel API (singular endpoint /patients/{id}/monitoring)
-    $apiResult = callAPI('GET', '/patients/' . urlencode($query) . '/monitoring');
+    $apiResult = callAPI('GET', '/pasien/' . urlencode($query) . '/monitoring');
 
-    if ($apiResult['status_code'] === 200 && isset($apiResult['response']['data'])) {
+    if ($apiResult['status_code'] === 0) {
+        $connectionError = 'Gagal terhubung ke server. Pastikan koneksi internet Anda stabil.';
+    } elseif ($apiResult['status_code'] === 200 && isset($apiResult['response']['data'])) {
         $data = $apiResult['response']['data'];
-        
-        // Filter by category if requested
-        if (empty($categoryFilter) || strtolower($data['patient_category'] ?? '') === strtolower($categoryFilter)) {
-            $result = $data;
-            $history = $data['monitorings'] ?? [];
-            
-            // Sort monitorings desc
-            if (!empty($history)) {
-                usort($history, fn($a, $b) => 
-                    strtotime(($b['monitoring_date'] ?? '') . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=> 
-                    strtotime(($a['monitoring_date'] ?? '') . ' ' . ($a['monitoring_time'] ?? '00:00:00'))
-                );
-            }
-        } else {
-            $error = 'Pasien ditemukan, namun kategori tidak cocok dengan filter "' . htmlspecialchars($categoryFilter) . '".';
+        $result = $data;
+        $history = $data['monitorings'] ?? [];
+
+        if (!empty($history)) {
+            usort($history, fn($a, $b) =>
+                strtotime(($b['monitoring_date'] ?? '') . ' ' . ($b['monitoring_time'] ?? '00:00:00')) <=>
+                strtotime(($a['monitoring_date'] ?? '') . ' ' . ($a['monitoring_time'] ?? '00:00:00'))
+            );
         }
     } elseif ($apiResult['status_code'] === 404) {
-        $error = 'Pasien dengan kode/NIK "<strong>' . htmlspecialchars($query) . '</strong>" tidak ditemukan dalam database.';
+        $error = 'Pasien dengan kode/NIK "<strong>' . htmlspecialchars($query) . '</strong>" tidak ditemukan.';
     } else {
-        $error = $apiResult['response']['message'] ?? 'Terjadi kesalahan teknis saat mencari data.';
-    }
-}
-
-function getStatusBadge($status) {
-    $s = strtolower($status ?? '');
-    if (str_contains($s, 'stable') || str_contains($s, 'stabil')) {
-        return '<span class="sv-badge sv-badge-stable">✅ Stabil</span>';
-    }
-    if (str_contains($s, 'referral') || str_contains($s, 'rujukan')) {
-        return '<span class="sv-badge sv-badge-referral">🚨 Perlu Rujukan</span>';
-    }
-    return '<span class="sv-badge sv-badge-control">⚠️ Perlu Kontrol</span>';
-}
-
-function calculateAge($dob) {
-    if (empty($dob)) return '-';
-    try {
-        return (new DateTime())->diff(new DateTime($dob))->y . ' Tahun';
-    } catch (Exception $e) {
-        return '-';
+        $msg = $apiResult['response']['message'] ?? 'Terjadi kesalahan saat mencari data.';
+        $error = htmlspecialchars($msg);
     }
 }
 ?>
@@ -164,6 +138,24 @@ function calculateAge($dob) {
 
         .btn-sv-primary:hover {
             background: var(--sv-blue-dark) !important;
+        }
+
+        .btn-sv-outline {
+            border: 1.5px solid var(--sv-border);
+            border-radius: 10px;
+            padding: 9px 22px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--sv-text-sub);
+            background: transparent;
+            transition: var(--sv-transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-sv-outline:hover {
+            border-color: var(--sv-blue);
+            color: var(--sv-blue);
+            background: rgba(0,122,255,0.04);
         }
 
         /* ── Breadcrumbs ── */
@@ -497,7 +489,6 @@ function calculateAge($dob) {
             <a href="about.php">Tentang Kami</a>
             <a href="jadwal.php" class="active">Cek Jadwal</a>
             <a href="#kontak">Kontak</a>
-            <a href="login.php" class="btn-sv-primary ms-3">Masuk Admin</a>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
@@ -505,7 +496,6 @@ function calculateAge($dob) {
         <a href="about.php">Tentang Kami</a>
         <a href="jadwal.php">Cek Jadwal</a>
         <a href="#kontak">Kontak</a>
-        <a href="login.php">Masuk Admin</a>
     </div>
 
     <!-- ════ MAIN CONTAINER ════ -->
@@ -610,109 +600,58 @@ function calculateAge($dob) {
 
             <!-- Search Panel -->
             <div id="search-panel" class="row g-4 mt-2">
-                <div class="col-lg-6">
-                    <div class="sv-content-card">
-                        <h2>Form Pencarian Riwayat Pasien</h2>
-                        <div class="sv-card-subtitle">Masukkan Kode Pasien atau NIK Dummy Anda untuk memuat dashboard klinis pribadi.</div>
-                        
-                        <form action="jadwal.php" method="GET">
-                            <div class="mb-4">
-                                <label for="q" class="form-label">Masukkan Kode Pasien / NIK Dummy</label>
-                                <input type="text" name="q" id="q" class="form-control" placeholder="Contoh: RM-2026-0001 atau NIK Dummy..." required>
+                <div class="col-lg-8 mx-auto">
+                    <div class="sv-content-card text-center">
+                        <h2>Cari Riwayat Monitoring Pasien</h2>
+                        <div class="sv-card-subtitle">Masukkan Kode Pasien atau NIK Dummy untuk melihat riwayat monitoring kesehatan.</div>
+
+                        <form action="jadwal.php" method="GET" class="mx-auto" style="max-width:500px;">
+                            <div class="mb-3">
+                                <input type="text" name="q" id="q" class="form-control form-control-lg text-center"
+                                    placeholder="Contoh: RM-2026-0001 atau NIK..."
+                                    required>
                             </div>
-                            <div class="mb-4">
-                                <label for="category" class="form-label">Kategori Binaan Pasien (Opsional)</label>
-                                <select name="category" id="category" class="form-select">
-                                    <option value="">Pilih Kategori Binaan</option>
-                                    <option value="Lansia">Lansia</option>
-                                    <option value="Hipertensi">Hipertensi</option>
-                                    <option value="Diabetes">Diabetes</option>
-                                    <option value="Pasca Rawat">Pasca Rawat</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-sv-primary w-100 py-3">Validasi & Cari Data</button>
+                            <button type="submit" class="btn btn-sv-primary w-100 py-3">🔍 Cari Data Pasien</button>
                         </form>
-
-                        <div class="sv-callout mt-4" style="background:#FFF0EF; border-color:#FFD0CC; color:#C0291F;">
-                            ⚠️ PENTING: Pastikan kode pasien atau NIK dimasukkan dengan benar. Akses tidak sah akan dicatat dalam log keamanan sistem.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="sv-content-card d-flex flex-column justify-content-between">
-                        <div>
-                            <h2>Informasi Sistem Validasi</h2>
-                            <div class="sv-card-subtitle">Bagaimana kami mengelola dan memverifikasi data Anda.</div>
-
-                            <div class="sv-list-item">
-                                <h5>1. Input Valid</h5>
-                                <p>Sistem menerima dan memverifikasi format kode pasien sesuai standar administrasi instansi kesehatan.</p>
-                            </div>
-                            <div class="sv-list-item">
-                                <h5>2. Pencocokan Database</h5>
-                                <p>Sinkronisasi aman dengan rekam medis elektronik terpusat guna memverifikasi integritas logs.</p>
-                            </div>
-                            <div class="sv-list-item">
-                                <h5>3. Tampilan Dasbor</h5>
-                                <p>Penyajian data riwayat pemantauan secara komprehensif, dilengkapi status klinis dan catatan petugas.</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <span class="sv-badge sv-badge-stable">Siklus Kunjungan Rut</span>
-                                <span class="sv-badge sv-badge-stable">Status Log Diperbarui</span>
-                                <span class="sv-badge sv-badge-stable">Metode Home Care</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
         <?php else: ?>
-            <!-- VIEW 2: SEARCH RESULTS & LIVE VALIDATION -->
+            <!-- VIEW 2: SEARCH RESULTS -->
             <div class="row g-4">
                 <div class="col-lg-5">
-                    <!-- Search Panel (Persistent) -->
                     <div class="sv-content-card">
-                        <h2>Cari & Validasi Data Riwayat Pasien</h2>
-                        <div class="sv-card-subtitle">Masukkan Kode Pasien atau NIK Dummy untuk melihat riwayat kunjungan home care dan status pemantauan klinis.</div>
+                        <h2>Cari Data Pasien Lain</h2>
+                        <div class="sv-card-subtitle">Masukkan Kode Pasien atau NIK Dummy lainnya.</div>
 
                         <form action="jadwal.php" method="GET">
                             <div class="mb-3">
-                                <label for="q" class="form-label">Masukkan Kode Pasien / NIK Dummy</label>
-                                <input type="text" name="q" id="q" class="form-control" placeholder="Contoh: RM-2026-0001..." value="<?= htmlspecialchars($query) ?>" required>
+                                <label for="q2" class="form-label">Kode Pasien / NIK</label>
+                                <input type="text" name="q" id="q2" class="form-control"
+                                    placeholder="Contoh: RM-2026-0001..."
+                                    value="<?= htmlspecialchars($query) ?>" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="category" class="form-label">Kategori Binaan Pasien (Opsional)</label>
-                                <select name="category" id="category" class="form-select">
-                                    <option value="">Pilih Kategori Binaan</option>
-                                    <option value="Lansia" <?= $categoryFilter === 'Lansia' ? 'selected' : '' ?>>Lansia</option>
-                                    <option value="Hipertensi" <?= $categoryFilter === 'Hipertensi' ? 'selected' : '' ?>>Hipertensi</option>
-                                    <option value="Diabetes" <?= $categoryFilter === 'Diabetes' ? 'selected' : '' ?>>Diabetes</option>
-                                    <option value="Pasca Rawat" <?= $categoryFilter === 'Pasca Rawat' ? 'selected' : '' ?>>Pasca Rawat</option>
-                                    <option value="Lainnya" <?= $categoryFilter === 'Lainnya' ? 'selected' : '' ?>>Lainnya</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-sv-primary w-100 py-3">Validasi & Cari Data</button>
+                            <button type="submit" class="btn btn-sv-primary w-100 py-3">🔍 Cari</button>
                         </form>
-
-                        <div class="sv-callout mt-4" style="background:#FFF0EF; border-color:#FFD0CC; color:#C0291F; font-size:11px;">
-                            ⚠️ Pastikan kode pasien atau NIK dimasukkan dengan benar. Akses tidak sah akan dicatat dalam log keamanan sistem.
-                        </div>
                     </div>
                 </div>
 
                 <div class="col-lg-7">
-                    <?php if (!empty($error)): ?>
-                        <!-- ERROR DISPLAY -->
+                    <?php if (!empty($connectionError)): ?>
+                        <div class="sv-content-card text-center py-5">
+                            <span style="font-size:48px;">🔌</span>
+                            <h3 class="mt-3">Koneksi Gagal</h3>
+                            <p class="text-muted" style="max-width:400px;margin:8px auto 0;"><?= htmlspecialchars($connectionError) ?></p>
+                            <a href="jadwal.php" class="btn btn-sv-outline mt-4">Coba Lagi</a>
+                        </div>
+                    <?php elseif (!empty($error)): ?>
+                        <!-- ERROR -->
                         <div class="sv-content-card text-center py-5">
                             <span style="font-size: 48px;">🔍</span>
-                            <h3 class="mt-3">Hasil Tidak Ditemukan</h3>
+                            <h3 class="mt-3">Pasien Tidak Ditemukan</h3>
                             <p class="text-muted" style="max-width: 400px; margin: 8px auto 0;"><?= $error ?></p>
-                            <a href="jadwal.php" class="btn btn-sv-outline mt-4">Kembali ke Lini Masa</a>
+                            <a href="jadwal.php" class="btn btn-sv-outline mt-4">Coba Cari Lagi</a>
                         </div>
                     <?php else: ?>
                         <!-- PATIENT VIEW CARD -->
@@ -853,8 +792,8 @@ function calculateAge($dob) {
                             <?php endif; ?>
 
                             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                                <a href="jadwal.php" class="btn btn-sv-outline">Kembali ke Jadwal</a>
-                                <button class="btn btn-sv-primary" onclick="window.print()">Unduh Laporan Riwayat Kunjungan (PDF)</button>
+                                <a href="jadwal.php" class="btn-sv-outline">← Cari Pasien Lain</a>
+                                <button class="btn btn-sv-primary" onclick="window.print()">🖨️ Cetak Riwayat</button>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -868,7 +807,7 @@ function calculateAge($dob) {
     <footer class="sv-footer" id="kontak">
         <div class="sv-footer-container">
             <div>
-                © 2026 sivisit. Data encrypted (AES-256). ISO 27001 Certified.
+                Sivisit-Kelompok 9 S1 Informatika UAS Pemrograman WEB ITSK Rs Dr Soepraoen Malang — Data simulasi, bukan diagnosis medis.
             </div>
             <div class="sv-footer-links">
                 <a href="#accessibility">Accessibility</a>

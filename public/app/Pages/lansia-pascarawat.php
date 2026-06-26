@@ -9,7 +9,7 @@ $history = [];
 
 if (!empty($query)) {
     // Hit Laravel API
-    $apiResult = callAPI('GET', '/patients/' . urlencode($query) . '/monitoring');
+    $apiResult = callAPI('GET', '/pasien/' . urlencode($query) . '/monitoring');
 
     if ($apiResult['status_code'] === 200 && isset($apiResult['response']['data'])) {
         $data = $apiResult['response']['data'];
@@ -389,7 +389,7 @@ function getStatusBadge($status) {
             <a href="about.php">Tentang Kami</a>
             <a href="jadwal.php">Cek Jadwal</a>
             <a href="#kontak">Kontak</a>
-            <a href="login.php" class="btn-sv-primary ms-3">Masuk Admin</a>
+            <a href="jadwal.php" class="btn-sv-primary ms-3">Cek Jadwal</a>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
@@ -397,7 +397,7 @@ function getStatusBadge($status) {
         <a href="about.php">Tentang Kami</a>
         <a href="jadwal.php">Cek Jadwal</a>
         <a href="#kontak">Kontak</a>
-        <a href="login.php">Masuk Admin</a>
+        <a href="jadwal.php">Cek Jadwal</a>
     </div>
 
     <!-- ════ MAIN CONTAINER ════ -->
@@ -623,7 +623,7 @@ function getStatusBadge($status) {
     <footer class="sv-footer" id="kontak">
         <div class="sv-footer-container">
             <div>
-                © 2026 sivisit. Data encrypted (AES-256). ISO 27001 Certified.
+                Sivisit-Kelompok 9 S1 Informatika UAS Pemrograman WEB ITSK Rs Dr Soepraoen Malang — Data simulasi, bukan diagnosis medis.
             </div>
             <div class="sv-footer-links">
                 <a href="#accessibility">Accessibility</a>

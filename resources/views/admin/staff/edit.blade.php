@@ -89,8 +89,14 @@
                         <label for="password" class="form-label">
                             <i class="bi bi-lock me-1" style="color:var(--sv-blue);"></i>Password Baru (Kosongkan jika tidak diubah)
                         </label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror"
-                               id="password" name="password">
+                        <div class="position-relative">
+                            <input type="password" class="form-control pe-5 @error('password') is-invalid @enderror"
+                                   id="password" name="password">
+                            <button type="button" class="btn btn-link position-absolute end-0 top-0 h-100 text-muted"
+                                    onclick="togglePassword('password', 'pwIcon')" style="z-index:5;text-decoration:none;">
+                                <i class="bi bi-eye" id="pwIcon"></i>
+                            </button>
+                        </div>
                         <small class="text-muted d-block mt-1">Minimal 6 karakter</small>
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -101,8 +107,14 @@
                         <label for="password_confirmation" class="form-label">
                             <i class="bi bi-lock-fill me-1" style="color:var(--sv-blue);"></i>Konfirmasi Password
                         </label>
-                        <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror"
-                               id="password_confirmation" name="password_confirmation">
+                        <div class="position-relative">
+                            <input type="password" class="form-control pe-5 @error('password_confirmation') is-invalid @enderror"
+                                   id="password_confirmation" name="password_confirmation">
+                            <button type="button" class="btn btn-link position-absolute end-0 top-0 h-100 text-muted"
+                                    onclick="togglePassword('password_confirmation', 'pwConfIcon')" style="z-index:5;text-decoration:none;">
+                                <i class="bi bi-eye" id="pwConfIcon"></i>
+                            </button>
+                        </div>
                         @error('password_confirmation')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -143,4 +155,16 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+}
+</script>
 @endsection

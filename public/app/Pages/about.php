@@ -754,7 +754,7 @@ $flowSearchQuery = trim($_GET['q'] ?? '');
             <a href="about.php" class="active">Tentang Kami</a>
             <a href="jadwal.php">Cek Jadwal</a>
             <a href="#kontak">Kontak</a>
-            <a href="login.php" class="btn-sv-primary ms-3">Masuk Admin</a>
+            <a href="jadwal.php" class="btn-sv-primary ms-3">Cek Jadwal</a>
         </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu">
@@ -762,7 +762,7 @@ $flowSearchQuery = trim($_GET['q'] ?? '');
         <a href="about.php">Tentang Kami</a>
         <a href="jadwal.php">Cek Jadwal</a>
         <a href="#kontak">Kontak</a>
-        <a href="login.php">Masuk Admin</a>
+        <a href="jadwal.php">Cek Jadwal</a>
     </div>
 
     <!-- ════ MAIN CONTAINER ════ -->
@@ -1007,7 +1007,7 @@ $flowSearchQuery = trim($_GET['q'] ?? '');
     <footer class="sv-footer" id="kontak">
         <div class="sv-footer-container">
             <div>
-                © 2026 sivisit. Data encrypted (AES-256). ISO 27001 Certified.
+                Sivisit-Kelompok 9 S1 Informatika UAS Pemrograman WEB ITSK Rs Dr Soepraoen Malang — Data simulasi, bukan diagnosis medis.
             </div>
             <div class="sv-footer-links">
                 <a href="#accessibility">Accessibility</a>

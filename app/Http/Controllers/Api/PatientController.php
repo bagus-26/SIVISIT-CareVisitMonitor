@@ -32,6 +32,80 @@ class PatientController extends Controller
         ], 200);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'patient_id'      => 'required|string|unique:patients,patient_id',
+            'patient_name'    => 'required|string|max:255',
+            'nik_dummy'       => 'nullable|string|size:16',
+            'datebirth'       => 'required|date',
+            'gender'          => 'required|in:Male,Female',
+            'address'         => 'required|string',
+            'latitude'        => 'nullable|numeric|between:-90,90',
+            'longitude'       => 'nullable|numeric|between:-180,180',
+            'family_phone'    => 'required|string',
+            'patient_category'=> 'required|string',
+        ]);
+
+        $patient = Patient::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pasien berhasil ditambahkan.',
+            'data'    => $patient,
+        ], 201);
+    }
+
+    public function update(Request $request, string $kode_pasien)
+    {
+        $patient = Patient::where('patient_id', $kode_pasien)->first();
+        if (!$patient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pasien tidak ditemukan.',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'patient_name'    => 'nullable|string|max:255',
+            'nik_dummy'       => 'nullable|string|size:16',
+            'datebirth'       => 'nullable|date',
+            'gender'          => 'nullable|in:Male,Female',
+            'address'         => 'nullable|string',
+            'latitude'        => 'nullable|numeric|between:-90,90',
+            'longitude'       => 'nullable|numeric|between:-180,180',
+            'family_phone'    => 'nullable|string',
+            'patient_category'=> 'nullable|string',
+        ]);
+
+        $patient->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pasien berhasil diperbarui.',
+            'data'    => $patient,
+        ], 200);
+    }
+
+    public function destroy(string $kode_pasien)
+    {
+        $patient = Patient::where('patient_id', $kode_pasien)->first();
+        if (!$patient) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pasien tidak ditemukan.',
+            ], 404);
+        }
+
+        $patient->monitorings()->delete();
+        $patient->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pasien beserta data monitoring berhasil dihapus.',
+        ], 200);
+    }
+
     public function monitoring(string $kode_pasien)
     {
         $patient = Patient::with([

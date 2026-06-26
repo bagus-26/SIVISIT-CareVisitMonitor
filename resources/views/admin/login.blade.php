@@ -466,7 +466,7 @@
                         <div class="lf-input-wrap">
                             <input type="email" name="email" id="email" class="lf-input"
                                    placeholder="nama@contoh.com"
-                                   value="{{ old('email', 'test@example.com') }}"
+                                    value="{{ old('email') }}"
                                    autocomplete="email" required>
                             <i class="bi bi-envelope lf-input-icon"></i>
                         </div>
@@ -478,7 +478,6 @@
                         <div class="lf-input-wrap">
                             <input type="password" name="password" id="password" class="lf-input"
                                    placeholder="••••••••"
-                                   value="password"
                                    autocomplete="current-password" required>
                             <i class="bi bi-lock lf-input-icon" style="pointer-events:none;"></i>
                             <button type="button" class="lf-pw-toggle" id="pwToggle" aria-label="Tampilkan password">
@@ -497,7 +496,7 @@
                 {{-- Hint --}}
                 <div class="lf-hint">
                     <i class="bi bi-info-circle-fill"></i>
-                    <span>Demo: <strong>test@example.com</strong> / <strong>password</strong></span>
+                    <span>Gunakan kredensial yang telah diberikan oleh administrator.</span>
                 </div>
             </div>
 

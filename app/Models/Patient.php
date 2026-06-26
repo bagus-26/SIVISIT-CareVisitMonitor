@@ -20,6 +20,8 @@ class Patient extends Model
         'datebirth',
         'gender',
         'address',
+        'latitude',
+        'longitude',
         'family_phone',
         'patient_category',
     ];
