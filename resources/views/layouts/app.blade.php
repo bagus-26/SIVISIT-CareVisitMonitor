@@ -75,6 +75,10 @@
                     class="sv-nav-link {{ request()->routeIs('admin.patients.search') ? 'active' : '' }}">
                     <i class="bi bi-search nav-icon"></i> Cari Pasien
                 </a>
+                <a href="{{ route('admin.location.map') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.location.map') ? 'active' : '' }}">
+                    <i class="bi bi-geo-alt nav-icon"></i> Monitoring Lokasi
+                </a>
                 @else
                 <span class="sv-nav-section-label">Menu Petugas</span>
                 <a href="{{ route('admin.monitorings.index') }}"
@@ -96,6 +100,10 @@
                 <a href="{{ route('admin.patients.search') }}"
                     class="sv-nav-link {{ request()->routeIs('admin.patients.search') ? 'active' : '' }}">
                     <i class="bi bi-search nav-icon"></i> Cari Pasien
+                </a>
+                <a href="{{ route('admin.location.saya') }}"
+                    class="sv-nav-link {{ request()->routeIs('admin.location.saya') ? 'active' : '' }}">
+                    <i class="bi bi-geo-alt nav-icon"></i> Lokasi Saya
                 </a>
                 @endif
             </nav>
@@ -156,7 +164,7 @@
 
             {{-- Footer --}}
             <footer class="sv-footer">
-                <span>© 2026 SIVISIT-CareVisitMonitor. Informatika Kesehatan.</span>
+                <span>Sivisit-CareVisitMonitor Kelompok 9 Pemrograman Web S1 Informatika ITSK Soepraoen Malang</span>
                 <span style="font-style:italic;color:#8E8E93;">Data bersifat simulasi/dummy. Bukan diagnosis medis.</span>
             </footer>
         </div>

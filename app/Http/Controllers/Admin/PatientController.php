@@ -74,10 +74,22 @@ class PatientController extends Controller
     {
         $patient = Patient::findOrFail($patient_id);
         
-        // Delete monitorings first (cascade/manual)
         $patient->monitorings()->delete();
         $patient->delete();
 
         return redirect()->route('admin.patients.index')->with('success', 'Data pasien berhasil dihapus.');
+    }
+
+    public function reassign(Request $request, $patient_id)
+    {
+        $request->validate([
+            'assigned_officer_id' => 'required|exists:users,id',
+        ]);
+
+        $patient = Patient::findOrFail($patient_id);
+        $patient->assigned_officer_id = $request->assigned_officer_id;
+        $patient->save();
+
+        return response()->json(['success' => true, 'message' => 'Pasien berhasil dialihkan.']);
     }
 }

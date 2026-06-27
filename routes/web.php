@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\LocationMonitorController;
 
 
 Route::get('/', function () {
@@ -74,7 +75,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
         Route::post('/admin/settings/profile', [SettingController::class, 'updateProfile'])->name('admin.settings.update-profile');
         Route::post('/admin/settings/password', [SettingController::class, 'changePassword'])->name('admin.settings.change-password');
+
+        // Location Monitor Routes (admin only)
+        Route::get('/admin/location', [LocationMonitorController::class, 'adminMap'])->name('admin.location.map');
+        Route::get('/admin/location/petugas/{id}/patients', [LocationMonitorController::class, 'getPetugasPatients'])->name('admin.location.petugas-patients');
     });
+
+    // Location Routes (all authenticated users)
+    Route::get('/admin/location/saya', [LocationMonitorController::class, 'petugasTracker'])->name('admin.location.saya');
+    Route::post('/admin/location/update', [LocationMonitorController::class, 'updateLocation'])->name('admin.location.update');
+
+    // Reassign Patient (admin only via AJAX)
+    Route::put('/admin/patients/{patient_id}/reassign', [PatientController::class, 'reassign'])->name('admin.patients.reassign')->middleware('role:admin');
 });
 
 

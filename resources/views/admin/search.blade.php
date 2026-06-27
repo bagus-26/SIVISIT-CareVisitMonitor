@@ -241,7 +241,7 @@
     <div class="row g-3">
         <div class="col-md-6 sv-animate-in sv-animate-in-1">
             <div class="sv-card" style="height:100%;">
-                <div style="font-size:24px;margin-bottom:12px;">🔍</div>
+                <div style="font-size:24px;margin-bottom:12px;"><i class="bi bi-search"></i></div>
                 <h6 style="font-weight:700;font-size:14px;">Cari Berdasarkan Nama</h6>
                 <p style="font-size:13px;color:var(--sv-text-muted);line-height:1.6;">
                     Masukkan nama pasien (sebagian atau lengkap). Contoh: "Slamet", "John", "Jane".
@@ -250,7 +250,7 @@
         </div>
         <div class="col-md-6 sv-animate-in sv-animate-in-2">
             <div class="sv-card" style="height:100%;">
-                <div style="font-size:24px;margin-bottom:12px;">🪪</div>
+                <div style="font-size:24px;margin-bottom:12px;"><i class="bi bi-person-vcard"></i></div>
                 <h6 style="font-weight:700;font-size:14px;">Cari Berdasarkan Kode RM / NIK</h6>
                 <p style="font-size:13px;color:var(--sv-text-muted);line-height:1.6;">
                     Masukkan kode RM (contoh: <code>P001</code>) atau NIK dummy 16 digit.
