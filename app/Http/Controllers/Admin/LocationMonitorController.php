@@ -18,7 +18,7 @@ class LocationMonitorController extends Controller
             ->select('id', 'name', 'latitude', 'longitude', 'last_location_at', 'phone', 'location')
             ->get()
             ->map(function ($u) {
-                $u->is_online = $u->last_location_at && $u->last_location_at->gt(now()->subMinutes(15));
+                $u->is_online = $u->last_location_at ? $u->last_location_at->gt(now()->subMinutes(15)) : false;
                 $u->assigned_patients = Patient::where('assigned_officer_id', $u->id)->count();
                 $u->today_visits = Monitoring::where('user_id', $u->id)
                     ->whereDate('monitoring_date', now())

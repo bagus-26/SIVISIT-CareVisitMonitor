@@ -1,66 +1,54 @@
-@extends('layouts.app')
-@section('title', 'Data Monitoring')
+<?php $__env->startSection('title', 'Data Monitoring'); ?>
 
-@section('extra-styles')
-<style>
-.filter-card { padding:14px 16px; }
-@media (max-width: 576px) {
-    .filter-card .search-wrap { width:100%; }
-    .filter-card .search-wrap input { width:100% !important; min-width:0 !important; }
-    .filter-tab { font-size:11.5px; padding:5px 10px; }
-}
-</style>
-@endsection
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="sv-page-header sv-animate-in">
     <div>
         <h1>Data Monitoring Kesehatan</h1>
         <p>Seluruh catatan monitoring pasien home care — diurutkan terbaru.</p>
     </div>
-    <a href="{{ route('admin.monitorings.create') }}" class="btn btn-primary">
+    <a href="<?php echo e(route('admin.monitorings.create')); ?>" class="btn btn-primary">
         <i class="bi bi-pencil-square me-1"></i> Catat Monitoring
     </a>
 </div>
 
-{{-- Stat Cards --}}
+
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-4 sv-animate-in sv-animate-in-1">
+    <div class="col-4 sv-animate-in sv-animate-in-1">
         <div class="sv-stat-card" style="--accent-color:#34C759;">
             <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
             <div class="stat-label">Stabil</div>
-            <div class="stat-value" style="color:#34C759;">{{ $countStable }}</div>
+            <div class="stat-value" style="color:#34C759;"><?php echo e($countStable); ?></div>
             <div class="stat-sub">Catatan monitoring</div>
         </div>
     </div>
-    <div class="col-6 col-md-4 sv-animate-in sv-animate-in-2">
+    <div class="col-4 sv-animate-in sv-animate-in-2">
         <div class="sv-stat-card" style="--accent-color:#FF9500;">
             <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div class="stat-label">Perlu Kontrol</div>
-            <div class="stat-value" style="color:#FF9500;">{{ $countControl }}</div>
+            <div class="stat-value" style="color:#FF9500;"><?php echo e($countControl); ?></div>
             <div class="stat-sub">Butuh tindak lanjut</div>
         </div>
     </div>
-    <div class="col-6 col-md-4 sv-animate-in sv-animate-in-3">
+    <div class="col-4 sv-animate-in sv-animate-in-3">
         <div class="sv-stat-card" style="--accent-color:#FF3B30;">
             <div class="stat-icon"><i class="bi bi-hospital-fill"></i></div>
             <div class="stat-label">Perlu Rujukan</div>
-            <div class="stat-value" style="color:#FF3B30;">{{ $countReferral }}</div>
+            <div class="stat-value" style="color:#FF3B30;"><?php echo e($countReferral); ?></div>
             <div class="stat-sub">Segera dirujuk</div>
         </div>
     </div>
 </div>
 
-{{-- Filter Tabs + Search --}}
-<div class="sv-card mb-3 sv-animate-in filter-card">
+
+<div class="sv-card mb-3 sv-animate-in" style="padding:14px 16px;">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div class="d-flex gap-2 flex-wrap" id="filterTabs">
-            <button class="filter-tab active" data-filter="all">Semua ({{ $monitorings->count() }})</button>
-            <button class="filter-tab tab-stable"   data-filter="stabil">Stabil ({{ $countStable }})</button>
-            <button class="filter-tab tab-control"  data-filter="kontrol">Perlu Kontrol ({{ $countControl }})</button>
-            <button class="filter-tab tab-referral" data-filter="rujukan">Perlu Rujukan ({{ $countReferral }})</button>
+            <button class="filter-tab active" data-filter="all">Semua (<?php echo e($monitorings->count()); ?>)</button>
+            <button class="filter-tab tab-stable"   data-filter="stabil">Stabil (<?php echo e($countStable); ?>)</button>
+            <button class="filter-tab tab-control"  data-filter="kontrol">Perlu Kontrol (<?php echo e($countControl); ?>)</button>
+            <button class="filter-tab tab-referral" data-filter="rujukan">Perlu Rujukan (<?php echo e($countReferral); ?>)</button>
         </div>
-        <div class="search-wrap" style="position:relative;">
+        <div style="position:relative;">
             <i class="bi bi-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8E8E93;pointer-events:none;"></i>
             <input type="text" id="tableSearch" placeholder="Cari nama pasien..."
                    style="padding:7px 12px 7px 32px;border:1.5px solid #D8DCE6;border-radius:8px;font-size:13px;font-family:inherit;outline:none;color:#1C1C1E;transition:all .2s;min-width:200px;"
@@ -69,11 +57,11 @@
     </div>
 </div>
 
-{{-- Table --}}
+
 <div class="sv-table-wrap sv-animate-in">
     <div class="sv-section-header">
         <h5><i class="bi bi-clipboard2-pulse me-2" style="color:var(--sv-blue);"></i>Riwayat Monitoring</h5>
-        <span style="font-size:12px;color:#8E8E93;" id="monCount">{{ $monitorings->count() }} catatan</span>
+        <span style="font-size:12px;color:#8E8E93;" id="monCount"><?php echo e($monitorings->count()); ?> catatan</span>
     </div>
     <div class="table-responsive">
         <table class="table mb-0" id="monTable">
@@ -90,62 +78,62 @@
                 </tr>
             </thead>
             <tbody id="monBody">
-                @forelse($monitorings as $m)
-                @php
+                <?php $__empty_1 = true; $__currentLoopData = $monitorings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                <?php
                     $s = strtolower($m->status ?? '');
                     $fkey = (str_contains($s,'stable')||str_contains($s,'stabil')) ? 'stabil'
                           : ((str_contains($s,'referral')||str_contains($s,'rujukan')) ? 'rujukan' : 'kontrol');
-                @endphp
-                <tr data-status="{{ $fkey }}" data-name="{{ strtolower($m->patient->patient_name ?? '') }}">
+                ?>
+                <tr data-status="<?php echo e($fkey); ?>" data-name="<?php echo e(strtolower($m->patient->patient_name ?? '')); ?>">
                     <td style="white-space:nowrap;">
-                        <div style="font-weight:600;font-size:13px;">{{ $m->monitoring_date ? \Carbon\Carbon::parse($m->monitoring_date)->format('d M Y') : '-' }}</div>
-                        <div style="font-size:11px;color:#8E8E93;">{{ $m->monitoring_time ? \Carbon\Carbon::parse($m->monitoring_time)->format('H:i').' WIB' : '' }}</div>
+                        <div style="font-weight:600;font-size:13px;"><?php echo e($m->monitoring_date ? \Carbon\Carbon::parse($m->monitoring_date)->format('d M Y') : '-'); ?></div>
+                        <div style="font-size:11px;color:#8E8E93;"><?php echo e($m->monitoring_time ? \Carbon\Carbon::parse($m->monitoring_time)->format('H:i').' WIB' : ''); ?></div>
                     </td>
                     <td>
-                        <div style="font-weight:600;font-size:13.5px;">{{ $m->patient->patient_name ?? '-' }}</div>
-                        <div style="font-size:11px;color:#007AFF;">{{ $m->patient->patient_id ?? '-' }}</div>
+                        <div style="font-weight:600;font-size:13.5px;"><?php echo e($m->patient->patient_name ?? '-'); ?></div>
+                        <div style="font-size:11px;color:#007AFF;"><?php echo e($m->patient->patient_id ?? '-'); ?></div>
                     </td>
                     <td>
-                        <div style="font-weight:600;">{{ $m->blood_pressure ?? '-' }}</div>
+                        <div style="font-weight:600;"><?php echo e($m->blood_pressure ?? '-'); ?></div>
                         <div style="font-size:10.5px;color:#8E8E93;">mmHg</div>
                     </td>
                     <td>
-                        <div style="font-weight:600;">{{ $m->body_temperature ?? '-' }}</div>
+                        <div style="font-weight:600;"><?php echo e($m->body_temperature ?? '-'); ?></div>
                         <div style="font-size:10.5px;color:#8E8E93;">°C</div>
                     </td>
-                    <td style="font-size:13px;max-width:160px;white-space:normal;">{{ Str::limit($m->symptoms ?? '-', 60) }}</td>
+                    <td style="font-size:13px;max-width:160px;white-space:normal;"><?php echo e(Str::limit($m->symptoms ?? '-', 60)); ?></td>
                     <td>
-                        @if(str_contains($s,'stable') || str_contains($s,'stabil'))
+                        <?php if(str_contains($s,'stable') || str_contains($s,'stabil')): ?>
                             <span class="sv-badge sv-badge-stable">Stabil</span>
-                        @elseif(str_contains($s,'referral') || str_contains($s,'rujukan'))
+                        <?php elseif(str_contains($s,'referral') || str_contains($s,'rujukan')): ?>
                             <span class="sv-badge sv-badge-referral">Perlu Rujukan</span>
-                        @else
+                        <?php else: ?>
                             <span class="sv-badge sv-badge-control">Perlu Kontrol</span>
-                        @endif
+                        <?php endif; ?>
                     </td>
-                    <td style="font-size:12px;color:#636366;">{{ $m->user->name ?? 'Petugas' }}</td>
+                    <td style="font-size:12px;color:#636366;"><?php echo e($m->user->name ?? 'Petugas'); ?></td>
                     <td style="text-align:right;">
-                        <a href="{{ route('admin.monitorings.show', $m->id) }}"
+                        <a href="<?php echo e(route('admin.monitorings.show', $m->id)); ?>"
                            class="btn btn-sm btn-outline-primary py-0" style="font-size:11.5px;">Detail</a>
                     </td>
                 </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <tr>
                     <td colspan="8">
                         <div class="sv-empty-state">
                             <i class="bi bi-clipboard2-pulse" style="font-size:40px;color:#D1D5DB;"></i>
-                            <p>Belum ada catatan monitoring. <a href="{{ route('admin.monitorings.create') }}">Catat monitoring pertama →</a></p>
+                            <p>Belum ada catatan monitoring. <a href="<?php echo e(route('admin.monitorings.create')); ?>">Catat monitoring pertama →</a></p>
                         </div>
                     </td>
                 </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script>
     const rows = document.querySelectorAll('#monBody tr[data-status]');
     const monCount = document.getElementById('monCount');
@@ -175,4 +163,6 @@
 
     document.getElementById('tableSearch').addEventListener('input', applyFilters);
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\sivisit_CareVisitMonitor\resources\views\monitoring\index.blade.php ENDPATH**/ ?>
