@@ -36,12 +36,20 @@
                 </div>
                 <div class="form-section-body">
                     <div class="mb-3">
-                        <label class="form-label">ID Petugas Medis</label>
-                        <input type="text" class="form-control" style="background:#F2F4F7;color:#636366;" value="PM-2026-{{ Auth::user()->id }}" readonly>
+                        <label for="assigned_officer_id" class="form-label">Pilih Petugas Kesehatan <span style="color:#FF3B30;">*</span></label>
+                        <select name="assigned_officer_id" id="assigned_officer_id" class="form-select" required>
+                            <option value="" selected disabled>-- Pilih Petugas --</option>
+                            @foreach($petugas as $p)
+                                <option value="{{ $p->id }}" {{ old('assigned_officer_id') == $p->id ? 'selected' : '' }}>
+                                    {{ $p->name }} ({{ $p->nip ?? 'NIP: -' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="validation-hint">Pilih petugas yang akan bertanggung jawab atas pasien ini</div>
                     </div>
                     <div class="mb-0">
-                        <label class="form-label">Nama Petugas Medis</label>
-                        <input type="text" class="form-control" style="background:#F2F4F7;color:#636366;" value="{{ Auth::user()->name }}" readonly>
+                        <label class="form-label">Diregistrasi Oleh</label>
+                        <input type="text" class="form-control" style="background:#F2F4F7;color:#636366;" value="{{ Auth::user()->name }} ({{ Auth::user()->role }})" readonly>
                     </div>
                 </div>
             </div>

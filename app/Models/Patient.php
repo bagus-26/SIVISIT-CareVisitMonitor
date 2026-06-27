@@ -24,10 +24,16 @@ class Patient extends Model
         'longitude',
         'family_phone',
         'patient_category',
+        'assigned_officer_id',
     ];
 
     public function monitorings()
     {
         return $this->hasMany(Monitoring::class, 'patient_id');
+    }
+
+    public function assignedOfficer()
+    {
+        return $this->belongsTo(User::class, 'assigned_officer_id');
     }
 }

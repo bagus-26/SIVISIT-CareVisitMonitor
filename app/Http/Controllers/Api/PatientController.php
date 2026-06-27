@@ -21,6 +21,10 @@ class PatientController extends Controller
                   ->orWhere('nik_dummy', 'LIKE', $q)
                   ->orWhere('patient_id', 'LIKE', $q);
             });
+        } elseif ($patientId = $request->query('patient_id')) {
+            $query->where('patient_id', $patientId);
+        } elseif ($nik = $request->query('nik')) {
+            $query->where('nik_dummy', $nik);
         }
 
         $patients = $query->get();
@@ -110,7 +114,9 @@ class PatientController extends Controller
     {
         $patient = Patient::with([
             'monitorings' => fn($q) => $q->with('user')->latest('monitoring_date')->latest('monitoring_time')
-        ])->where('patient_id', $kode_pasien)->first();
+        ])->where('patient_id', $kode_pasien)
+          ->orWhere('nik_dummy', $kode_pasien)
+          ->first();
 
         if (!$patient) {
             return response()->json([

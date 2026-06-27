@@ -31,13 +31,10 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Patient Routes — all roles can access
+    // Patient Routes — all roles can access (view & search only)
     Route::get('/admin/patients', [PatientController::class, 'index'])->name('admin.patients.index');
-    Route::get('/admin/patients/create', [PatientController::class, 'create'])->name('admin.patients.create');
-    Route::post('/admin/patients', [PatientController::class, 'store'])->name('admin.patients.store');
     Route::get('/admin/patients/{patient_id}/edit', [PatientController::class, 'edit'])->name('admin.patients.edit');
     Route::put('/admin/patients/{patient_id}', [PatientController::class, 'update'])->name('admin.patients.update');
-    Route::delete('/admin/patients/{patient_id}', [PatientController::class, 'destroy'])->name('admin.patients.destroy');
     Route::get('/admin/search', [SearchController::class, 'index'])->name('admin.patients.search');
 
     // Monitoring Routes — all roles can access
@@ -55,6 +52,11 @@ Route::middleware('auth')->group(function () {
 
     // Admin-only routes
     Route::middleware('role:admin')->group(function () {
+        // Patient Create & Delete (admin only)
+        Route::get('/admin/patients/create', [PatientController::class, 'create'])->name('admin.patients.create');
+        Route::post('/admin/patients', [PatientController::class, 'store'])->name('admin.patients.store');
+        Route::delete('/admin/patients/{patient_id}', [PatientController::class, 'destroy'])->name('admin.patients.destroy');
+
         // Staff Routes
         Route::get('/admin/staff', [StaffController::class, 'index'])->name('admin.staff.index');
         Route::get('/admin/staff/create', [StaffController::class, 'create'])->name('admin.staff.create');

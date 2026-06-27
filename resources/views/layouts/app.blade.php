@@ -186,6 +186,20 @@
             document.getElementById('svOverlay').classList.remove('active');
             document.body.style.overflow = '';
         }
+        // Auto-close sidebar on nav link click (mobile)
+        document.querySelectorAll('.sv-nav-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 991) {
+                    closeSidebar();
+                }
+            });
+        });
+        // Close sidebar on window resize past breakpoint
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 991) {
+                closeSidebar();
+            }
+        });
     </script>
     @yield('scripts')
 </body>

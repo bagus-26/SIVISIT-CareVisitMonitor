@@ -16,16 +16,17 @@ class StorePatientRequest extends FormRequest
         $patientId = $this->route('patient');
 
         return [
-            'patient_id'       => $patientId
+            'patient_id'          => $patientId
                 ? 'sometimes|string|unique:patients,patient_id,' . $patientId . ',patient_id'
                 : 'required|string|unique:patients,patient_id',
-            'patient_name'     => 'required|string|max:255',
-            'nik_dummy'        => 'required|string|max:20',
-            'datebirth'        => 'required|date',
-            'gender'           => 'required|in:Male,Female',
-            'address'          => 'required|string',
-            'family_phone'     => 'required|string|max:20',
-            'patient_category' => 'required|string|max:100',
+            'patient_name'        => 'required|string|max:255',
+            'nik_dummy'           => 'required|string|max:20',
+            'datebirth'           => 'required|date',
+            'gender'              => 'required|in:Male,Female',
+            'address'             => 'required|string',
+            'family_phone'        => 'required|string|max:20',
+            'patient_category'    => 'required|string|max:100',
+            'assigned_officer_id' => 'nullable|exists:users,id',
         ];
     }
 

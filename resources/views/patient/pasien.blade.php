@@ -7,9 +7,11 @@
         <h1>Daftar Pasien Binaan</h1>
         <p>Kelola data pasien binaan home care SIVISIT.</p>
     </div>
+    @if(Auth::user()->role === 'admin')
     <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">
         <i class="bi bi-person-plus me-1"></i> Tambah Pasien Baru
     </a>
+    @endif
 </div>
 
 @if(session('success'))
@@ -72,7 +74,11 @@
                         <td colspan="7">
                             <div class="sv-empty-state">
                                 <i class="bi bi-people" style="font-size:40px;color:#D1D5DB;"></i>
-                                <p>Belum ada data pasien terdaftar. <a href="{{ route('admin.patients.create') }}">Tambah pasien pertama →</a></p>
+                                <p>Belum ada data pasien terdaftar.
+                                    @if(Auth::user()->role === 'admin')
+                                        <a href="{{ route('admin.patients.create') }}">Tambah pasien pertama →</a>
+                                    @endif
+                                </p>
                             </div>
                         </td>
                     </tr>
