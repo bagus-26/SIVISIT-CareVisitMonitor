@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\MonitoringController;
 use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Auth Routes ──────────────────────────────────────
@@ -22,6 +23,16 @@ Route::delete('/pasien/{kode_pasien}',      [PatientController::class, 'destroy'
 Route::post('/monitoring',                  [MonitoringController::class, 'store']);
 Route::get('/monitoring',                   [MonitoringController::class, 'index']);
 Route::get('/monitoring/status/{status}',   [MonitoringController::class, 'byStatus']);
+Route::get('/monitoring/{id}',              [MonitoringController::class, 'show']);
+Route::put('/monitoring/{id}',              [MonitoringController::class, 'update']);
+Route::delete('/monitoring/{id}',           [MonitoringController::class, 'destroy']);
+
+// ─── Jadwal Kunjungan Routes ──────────────────────────
+Route::get('/jadwal',                       [ScheduleController::class, 'index']);
+Route::post('/jadwal',                      [ScheduleController::class, 'store']);
+Route::get('/jadwal/{id}',                  [ScheduleController::class, 'show']);
+Route::put('/jadwal/{id}',                  [ScheduleController::class, 'update']);
+Route::delete('/jadwal/{id}',               [ScheduleController::class, 'destroy']);
 
 // ─── Location Routes ──────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {

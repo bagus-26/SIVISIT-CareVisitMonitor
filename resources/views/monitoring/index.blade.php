@@ -13,6 +13,19 @@
 @endsection
 
 @section('content')
+
+{{-- Flash Messages --}}
+@if(session('success'))
+<div class="alert alert-success d-flex align-items-center gap-2 mb-3 sv-animate-in" role="alert">
+    <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+</div>
+@endif
+@if(session('error'))
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-3 sv-animate-in" role="alert">
+    <i class="bi bi-exclamation-circle-fill"></i> {{ session('error') }}
+</div>
+@endif
+
 <div class="sv-page-header sv-animate-in">
     <div>
         <h1>Data Monitoring Kesehatan</h1>
@@ -125,8 +138,18 @@
                     </td>
                     <td style="font-size:12px;color:#636366;">{{ $m->user->name ?? 'Petugas' }}</td>
                     <td style="text-align:right;">
-                        <a href="{{ route('admin.monitorings.show', $m->id) }}"
-                           class="btn btn-sm btn-outline-primary py-0" style="font-size:11.5px;">Detail</a>
+                        <div class="d-flex gap-1 justify-content-end">
+                            <a href="{{ route('admin.monitorings.show', $m->id) }}"
+                               class="btn btn-sm btn-outline-primary py-0" style="font-size:11.5px;">Detail</a>
+                            <a href="{{ route('admin.monitorings.edit', $m->id) }}"
+                               class="btn btn-sm btn-outline-secondary py-0" style="font-size:11.5px;">Edit</a>
+                            <form action="{{ route('admin.monitorings.destroy', $m->id) }}" method="POST"
+                                  onsubmit="return confirm('Yakin ingin menghapus catatan monitoring ini?')" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0" style="font-size:11.5px;">Hapus</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

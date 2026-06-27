@@ -43,6 +43,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/monitorings/create', [MonitoringController::class, 'create'])->name('admin.monitorings.create');
     Route::post('/admin/monitorings', [MonitoringController::class, 'store'])->name('admin.monitorings.store');
     Route::get('/admin/monitorings/{id}', [MonitoringController::class, 'show'])->name('admin.monitorings.show');
+    Route::get('/admin/monitorings/{id}/edit', [MonitoringController::class, 'edit'])->name('admin.monitorings.edit');
+    Route::put('/admin/monitorings/{id}', [MonitoringController::class, 'update'])->name('admin.monitorings.update');
+    Route::delete('/admin/monitorings/{id}', [MonitoringController::class, 'destroy'])->name('admin.monitorings.destroy');
 
     // Rekam Medis Routes — all roles can access
     Route::get('/admin/rekam-medis', [RekamMedisController::class, 'index'])->name('admin.rekam-medis.index');

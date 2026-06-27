@@ -82,4 +82,58 @@ class MonitoringController extends Controller
 
         return view('monitoring.show', compact('monitoring', 'patientHistory'));
     }
+
+    public function edit($id)
+    {
+        $monitoring = Monitoring::with('patient')->findOrFail($id);
+        $patients   = Patient::orderBy('patient_name', 'asc')->get();
+
+        return view('monitoring.edit', compact('monitoring', 'patients'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $monitoring = Monitoring::findOrFail($id);
+
+        $validated = $request->validate([
+            'patient_id'        => 'required|exists:patients,patient_id',
+            'monitoring_date'   => 'required|date',
+            'monitoring_time'   => 'nullable',
+            'blood_pressure'    => [
+                'required',
+                'regex:/^\d{2,3}\/\d{2,3}$/',
+                function ($attribute, $value, $fail) {
+                    [$sys, $dia] = explode('/', $value);
+                    if ($sys < 60 || $sys > 250 || $dia < 40 || $dia > 150) {
+                        $fail('Format tekanan darah tidak valid. Nilai sistolik: 60–250, diastolik: 40–150.');
+                    }
+                }
+            ],
+            'body_temperature'  => 'required|numeric|between:35.0,42.0',
+            'heart_rate'        => 'nullable|integer|between:30,250',
+            'respiratory_rate'  => 'nullable|integer|between:5,60',
+            'oxygen_saturation' => 'nullable|numeric|between:50,100',
+            'symptoms'          => 'required|string',
+            'notes'             => 'nullable|string',
+            'recommendation'    => 'nullable|string',
+            'next_visit_date'   => 'nullable|date',
+            'status'            => 'required|in:Stable,Need Control,Need Referral',
+        ]);
+
+        $monitoring->update($validated);
+
+        return redirect()
+            ->route('admin.monitorings.show', $monitoring->id)
+            ->with('success', 'Catatan monitoring berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $monitoring = Monitoring::findOrFail($id);
+        $monitoring->delete();
+
+        return redirect()
+            ->route('admin.monitorings.index')
+            ->with('success', 'Catatan monitoring berhasil dihapus.');
+    }
 }

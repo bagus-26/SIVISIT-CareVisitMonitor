@@ -40,6 +40,13 @@
     </div>
     <div class="d-flex gap-2 flex-wrap">
         <button onclick="window.print()" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer me-1"></i> Cetak</button>
+        <a href="{{ route('admin.monitorings.edit', $monitoring->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Edit</a>
+        <form action="{{ route('admin.monitorings.destroy', $monitoring->id) }}" method="POST"
+              onsubmit="return confirm('Yakin ingin menghapus catatan monitoring ini? Tindakan ini tidak dapat dibatalkan.')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Hapus</button>
+        </form>
         <a href="{{ route('admin.monitorings.create', ['patient_id' => $monitoring->patient_id]) }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i> Monitoring Baru</a>
         <a href="{{ route('admin.monitorings.index') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i> Kembali</a>
     </div>
