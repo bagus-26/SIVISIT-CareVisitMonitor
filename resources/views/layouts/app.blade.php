@@ -46,7 +46,7 @@
                     <i class="bi bi-speedometer2 nav-icon"></i> Dashboard
                 </a>
                 <a href="{{ route('admin.patients.index') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.patients.*') ? 'active' : '' }}">
+                    class="sv-nav-link {{ request()->routeIs('admin.patients.index') || request()->routeIs('admin.patients.create') || request()->routeIs('admin.patients.edit') || request()->routeIs('admin.patients.update') ? 'active' : '' }}">
                     <i class="bi bi-people nav-icon"></i> Pasien
                 </a>
                 <a href="{{ route('admin.staff.index') }}"
@@ -82,7 +82,7 @@
                 @else
                 <span class="sv-nav-section-label">Menu Petugas</span>
                 <a href="{{ route('admin.monitorings.index') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.*') ? 'active' : '' }}">
+                    class="sv-nav-link {{ request()->routeIs('admin.monitorings.index') || request()->routeIs('admin.monitorings.show') ? 'active' : '' }}">
                     <i class="bi bi-clipboard2-pulse nav-icon"></i> Kunjungan
                 </a>
                 <a href="{{ route('admin.monitorings.create') }}"
@@ -90,7 +90,7 @@
                     <i class="bi bi-pencil-square nav-icon"></i> Catat Monitoring
                 </a>
                 <a href="{{ route('admin.patients.index') }}"
-                    class="sv-nav-link {{ request()->routeIs('admin.patients.*') ? 'active' : '' }}">
+                    class="sv-nav-link {{ request()->routeIs('admin.patients.index') || request()->routeIs('admin.patients.edit') || request()->routeIs('admin.patients.update') ? 'active' : '' }}">
                     <i class="bi bi-people nav-icon"></i> Pasien
                 </a>
                 <a href="{{ route('admin.rekam-medis.index') }}"

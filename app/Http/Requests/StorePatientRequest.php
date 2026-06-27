@@ -13,7 +13,7 @@ class StorePatientRequest extends FormRequest
 
     public function rules(): array
     {
-        $patientId = $this->route('patient');
+        $patientId = $this->route('patient_id');
 
         return [
             'patient_id'          => $patientId

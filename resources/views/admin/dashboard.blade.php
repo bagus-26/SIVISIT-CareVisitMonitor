@@ -13,9 +13,6 @@
         <h1>{{ $greeting }}, {{ Auth::user()->name ?? 'Petugas' }}</h1>
         <p>Berikut adalah ringkasan operasional klinis hari ini, {{ now()->translatedFormat('l, d F Y') }}.</p>
     </div>
-    <a href="{{ route('admin.patients.create') }}" class="btn btn-primary">
-        <i class="bi bi-person-plus me-1"></i> Tambah Pasien
-    </a>
 </div>
 
 {{-- Stat Cards --}}
@@ -185,10 +182,7 @@
             <hr style="border-color:#F0F2F5;margin:20px 0;">
             <h6 style="font-size:13px;font-weight:600;color:#636366;margin-bottom:12px;">AKSI CEPAT</h6>
             <div class="d-flex flex-column gap-2">
-                <a href="{{ route('admin.patients.create') }}" class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-person-plus me-1"></i> Tambah Pasien Baru
-                </a>
-                <a href="{{ route('admin.monitorings.create') }}" class="btn btn-sm btn-outline-secondary">
+                <a href="{{ route('admin.monitorings.create') }}" class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-pencil-square me-1"></i> Catat Monitoring
                 </a>
                 <a href="{{ route('admin.monitorings.index') }}" class="btn btn-sm btn-outline-secondary">
