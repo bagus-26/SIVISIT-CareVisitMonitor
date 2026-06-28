@@ -85,6 +85,10 @@
                     <div style="font-size:13.5px;color:var(--sv-text-sub);margin-top:3px;">📍 {{ $monitoring->patient->address }}</div>
                 </div>
                 @endif
+                <div class="col-md-4">
+                    <div style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--sv-text-muted);">Petugas</div>
+                    <div style="font-size:14px;font-weight:500;margin-top:3px;">👨‍⚕️ {{ $monitoring->user->name ?? '-' }} ({{ $monitoring->user->role ?? 'Petugas' }})</div>
+                </div>
             </div>
         </div>
 

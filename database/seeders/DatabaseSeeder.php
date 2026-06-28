@@ -22,17 +22,17 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admincarevisit@2026.dev',
             'password' => Hash::make('password'),
-            'role' => 'Koordinator Layanan',
+            'role' => 'admin',
             'nip' => '199208152019031002',
             'phone' => '081234567890',
             'location' => 'Puskesmas Dinoyo, Malang',
         ]);
 
         $testUser = User::create([
-            'name' => 'Test User',
+            'name' => 'Test Petugas',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
-            'role' => 'Perawat Home Care',
+            'role' => 'petugas',
             'nip' => '199504102021022003',
             'phone' => '082345678901',
             'location' => 'Puskesmas Dinoyo, Malang',
@@ -47,6 +47,7 @@ class DatabaseSeeder extends Seeder
             'family_phone' => '08776543210',
             'gender' => 'Male',
             'patient_category' => 'Dewasa',
+            'assigned_officer_id' => $testUser->id,
         ]);
 
         $p2 = Patient::create([
@@ -58,6 +59,7 @@ class DatabaseSeeder extends Seeder
             'family_phone' => '08123456789',
             'gender' => 'Female',
             'patient_category' => 'Dewasa',
+            'assigned_officer_id' => $testUser->id,
         ]);
 
         $p3 = Patient::create([
@@ -69,6 +71,7 @@ class DatabaseSeeder extends Seeder
             'family_phone' => '082234567890',
             'gender' => 'Male',
             'patient_category' => 'Lansia',
+            'assigned_officer_id' => $testUser->id,
         ]);
 
         $p4 = Patient::create([
@@ -80,6 +83,7 @@ class DatabaseSeeder extends Seeder
             'family_phone' => '085334567891',
             'gender' => 'Female',
             'patient_category' => 'Lansia',
+            'assigned_officer_id' => $testUser->id,
         ]);
 
         $p5 = Patient::create([
@@ -91,6 +95,7 @@ class DatabaseSeeder extends Seeder
             'family_phone' => '081998877665',
             'gender' => 'Male',
             'patient_category' => 'Diabetes',
+            'assigned_officer_id' => $testUser->id,
         ]);
 
         $p6 = Patient::create([
@@ -102,6 +107,7 @@ class DatabaseSeeder extends Seeder
             'family_phone' => '085677788899',
             'gender' => 'Female',
             'patient_category' => 'Pasca Rawat',
+            'assigned_officer_id' => $testUser->id,
         ]);
 
         // Add some monitoring records for today

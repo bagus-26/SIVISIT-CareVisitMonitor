@@ -67,8 +67,8 @@
                 <div class="form-section-body">
                     <div class="mb-3">
                         <label for="patient_id" class="form-label">Nomor Rekam Medis (No. RM) <span style="color:#FF3B30;">*</span></label>
-                        <input type="text" name="patient_id" id="patient_id" class="form-control" placeholder="Contoh: P005" value="{{ old('patient_id') }}" required>
-                        <div class="validation-hint">Gunakan kode pasien unik (misal: P005 atau RM-2026-0005)</div>
+                        <input type="text" name="patient_id" id="patient_id" class="form-control" value="{{ old('patient_id', $nextId) }}" readonly required>
+                        <div class="validation-hint">Nomor RM akan terisi otomatis</div>
                     </div>
                     <div class="mb-0">
                         <label for="monitoring_date" class="form-label">Jadwal Kontrol Pasien</label>

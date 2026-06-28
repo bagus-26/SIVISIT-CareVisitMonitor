@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Patient;
 use App\Models\Monitoring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -13,29 +14,39 @@ class DashboardController extends Controller
     public function index()
     {
         $todayDate = date('Y-m-d');
+        $user = Auth::user();
+        $isPetugas = $user->role === 'petugas';
 
-        $totalPatients = Patient::query()->count();
-        $todayVisits   = Monitoring::query()->where('monitoring_date', $todayDate)->count();
-        $todayFinished = Monitoring::query()
+        if ($isPetugas) {
+            $patientIds = Patient::where('assigned_officer_id', $user->id)->pluck('patient_id');
+            $baseQuery = Monitoring::whereIn('patient_id', $patientIds);
+            $totalPatients = Patient::where('assigned_officer_id', $user->id)->count();
+        } else {
+            $baseQuery = Monitoring::query();
+            $totalPatients = Patient::query()->count();
+        }
+
+        $todayVisits   = (clone $baseQuery)->where('monitoring_date', $todayDate)->count();
+        $todayFinished = (clone $baseQuery)
             ->where('monitoring_date', $todayDate)
             ->where('status', 'Stable')
             ->count();
 
-        $needControl  = Monitoring::query()->where('status', 'Need Control')->count();
-        $needReferral = Monitoring::query()->where('status', 'Need Referral')->count();
+        $needControl  = (clone $baseQuery)->where('status', 'Need Control')->count();
+        $needReferral = (clone $baseQuery)->where('status', 'Need Referral')->count();
 
-        $todayAgenda = Monitoring::query()
-            ->with('patient')
+        $todayAgenda = (clone $baseQuery)
+            ->with('patient.assignedOfficer')
             ->where('monitoring_date', $todayDate)
             ->orderBy('monitoring_time')
             ->get();
 
-        $latestIds = Monitoring::query()
+        $latestIds = (clone $baseQuery)
             ->select(DB::raw('MAX(id) as id'))
             ->groupBy('patient_id')
             ->pluck('id');
 
-        $monitorPatients = Monitoring::query()
+        $monitorPatients = (clone $baseQuery)
             ->with('patient')
             ->whereIn('id', $latestIds)
             ->orderByDesc('monitoring_date')
@@ -54,7 +65,7 @@ class DashboardController extends Controller
         $dayLabels    = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = date('Y-m-d', strtotime("-$i days"));
-            $count = Monitoring::query()->where('monitoring_date', $date)->count();
+            $count = (clone $baseQuery)->where('monitoring_date', $date)->count();
             $weeklyVisits[] = $count;
             $dayLabels[]    = strtoupper(\Carbon\Carbon::parse($date)->isoFormat('dd'));
         }

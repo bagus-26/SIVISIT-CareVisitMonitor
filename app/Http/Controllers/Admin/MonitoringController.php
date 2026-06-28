@@ -12,14 +12,27 @@ class MonitoringController extends Controller
 {
     public function index()
     {
-        $monitorings = Monitoring::with('patient', 'user')
-            ->orderBy('monitoring_date', 'desc')
+        $user = Auth::user();
+        $isPetugas = $user->role === 'petugas';
+
+        $query = Monitoring::with('patient.assignedOfficer', 'user');
+
+        if ($isPetugas) {
+            $patientIds = Patient::where('assigned_officer_id', $user->id)->pluck('patient_id');
+            $query->whereIn('patient_id', $patientIds);
+        }
+
+        $monitorings = $query->orderBy('monitoring_date', 'desc')
             ->orderBy('monitoring_time', 'desc')
             ->get();
 
-        $countStable = Monitoring::where('status', 'Stable')->count();
-        $countControl = Monitoring::where('status', 'Need Control')->count();
-        $countReferral = Monitoring::where('status', 'Need Referral')->count();
+        $baseQuery = $isPetugas
+            ? Monitoring::whereIn('patient_id', Patient::where('assigned_officer_id', $user->id)->pluck('patient_id'))
+            : Monitoring::query();
+
+        $countStable = (clone $baseQuery)->where('status', 'Stable')->count();
+        $countControl = (clone $baseQuery)->where('status', 'Need Control')->count();
+        $countReferral = (clone $baseQuery)->where('status', 'Need Referral')->count();
 
         return view('monitoring.index', compact(
             'monitorings',
@@ -31,7 +44,7 @@ class MonitoringController extends Controller
 
     public function create(Request $request)
     {
-        $patients = Patient::orderBy('patient_name', 'asc')->get();
+        $patients = Patient::with('assignedOfficer')->orderBy('patient_name', 'asc')->get();
         $prePatientId = $request->query('patient_id', '');
 
         return view('monitoring.create', compact('patients', 'prePatientId'));
@@ -64,7 +77,10 @@ class MonitoringController extends Controller
             'status' => 'required|in:Stable,Need Control,Need Referral',
         ]);
 
-        $validated['user_id'] = Auth::id() ?? 1;
+        $patient = Patient::find($validated['patient_id']);
+        $validated['user_id'] = $patient && $patient->assigned_officer_id
+            ? $patient->assigned_officer_id
+            : (Auth::id() ?? 1);
 
         Monitoring::create($validated);
 

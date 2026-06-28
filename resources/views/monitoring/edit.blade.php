@@ -72,9 +72,9 @@
                                    value="{{ old('monitoring_time', $monitoring->monitoring_time ? \Carbon\Carbon::parse($monitoring->monitoring_time)->format('H:i') : '') }}">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Petugas Pemeriksa</label>
+                            <label class="form-label">Petugas</label>
                             <input type="text" class="form-control" style="background:#F2F4F7;color:#636366;"
-                                   value="{{ $monitoring->user->name ?? Auth::user()->name ?? 'Petugas' }}" readonly>
+                                   value="{{ $monitoring->user->name ?? Auth::user()->name ?? 'Petugas' }} ({{ $monitoring->user->role ?? Auth::user()->role ?? 'Petugas' }})" readonly>
                         </div>
                     </div>
                 </div>

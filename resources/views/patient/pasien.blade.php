@@ -32,9 +32,10 @@
                     <th style="width: 50px;">No</th>
                     <th>Kode Pasien</th>
                     <th>Nama Pasien</th>
-                    <th>Usia</th>
-                    <th>Diagnosa Medis</th>
-                    <th>Alamat</th>
+                    <th class="d-none d-md-table-cell">Usia</th>
+                    <th class="d-none d-lg-table-cell">Diagnosa Medis</th>
+                    <th class="d-none d-md-table-cell">Alamat</th>
+                    <th>Petugas</th>
                     <th style="text-align:right;">Aksi</th>
                 </tr>
             </thead>
@@ -48,30 +49,31 @@
                         <td>{{ $index + 1 }}</td>
                         <td><strong style="color:var(--sv-blue);">{{ $p->patient_id }}</strong></td>
                         <td class="fw-semibold">{{ $p->patient_name ?? '-' }}</td>
-                        <td>{{ isset($p->datebirth) ? \Carbon\Carbon::parse($p->datebirth)->age . ' Tahun' : '-' }}</td>
-                        <td>
+                        <td class="d-none d-md-table-cell">{{ isset($p->datebirth) ? \Carbon\Carbon::parse($p->datebirth)->age . ' Tahun' : '-' }}</td>
+                        <td class="d-none d-lg-table-cell">
                             @if($diagnosa !== '-' && !empty($diagnosa))
-                                <span class="sv-badge sv-badge-referral">{{ $diagnosa }}</span>
+                                <span class="sv-badge sv-badge-referral" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $diagnosa }}</span>
                             @else
                                 <span class="sv-badge bg-light text-muted">-</span>
                             @endif
                         </td>
-                        <td style="font-size:12.5px;color:var(--sv-text-sub);">{{ Str::limit($p->address ?? '-', 50) }}</td>
+                        <td class="d-none d-md-table-cell" style="font-size:12.5px;color:var(--sv-text-sub);">{{ Str::limit($p->address ?? '-', 50) }}</td>
+                        <td style="font-size:12px;color:var(--sv-text-sub);">{{ $p->assignedOfficer->name ?? '-' }}</td>
                         <td style="text-align:right;">
                             <div class="d-inline-flex gap-1">
                                 <button class="btn btn-sm btn-outline-primary py-1" data-bs-toggle="modal" data-bs-target="#viewModal{{ $p->patient_id }}">Lihat</button>
-                                <a href="{{ route('admin.patients.edit', $p->patient_id) }}" class="btn btn-sm btn-outline-secondary py-1">Edit</a>
+                                <a href="{{ route('admin.patients.edit', $p->patient_id) }}" class="btn btn-sm btn-outline-secondary py-1 d-none d-md-inline-flex">Edit</a>
                                 <form action="{{ route('admin.patients.destroy', $p->patient_id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pasien ini beserta riwayat monitoringnya?')" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger py-1">Hapus</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-1 d-none d-md-inline-flex">Hapus</button>
                                 </form>
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="sv-empty-state">
                                 <i class="bi bi-people" style="font-size:40px;color:#D1D5DB;"></i>
                                 <p>Belum ada data pasien terdaftar.

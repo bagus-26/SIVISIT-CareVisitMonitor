@@ -92,4 +92,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/patients/{patient_id}/reassign', [PatientController::class, 'reassign'])->name('admin.patients.reassign')->middleware('role:admin');
 });
 
+// ─── Route Darurat untuk Clear Cache di InfinityFree (Tanpa Terminal) ───
+Route::get('/clear-semua-cache', function() {
+    \Artisan::call('route:clear');
+    \Artisan::call('view:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('cache:clear');
+    return "Semua cache di server berhasil dibersihkan! Silakan hapus kembali route ini demi keamanan.";
+});
+
 

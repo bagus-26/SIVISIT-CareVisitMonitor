@@ -1,6 +1,22 @@
 @extends('layouts.app')
 @section('title', 'Rekam Medis')
 
+@section('extra-styles')
+<style>
+#rmSearch {
+    padding:7px 12px 7px 32px;border:1.5px solid #D8DCE6;border-radius:8px;
+    font-size:13px;font-family:inherit;outline:none;color:#1C1C1E;
+    transition:all .2s;min-width:200px;
+}
+#rmSearch:focus { border-color:#007AFF; }
+.filter-scroll { max-height:240px; overflow-y:auto; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.filter-scroll .filter-tab { flex-shrink:0; }
+@media (max-width:768px) {
+    .filter-scroll { max-height:180px; }
+}
+</style>
+@endsection
+
 @section('content')
 <div class="sv-page-header sv-animate-in">
     <div>
@@ -14,7 +30,7 @@
 
 {{-- Stats --}}
 <div class="row g-3 mb-4">
-    <div class="col-4 sv-animate-in sv-animate-in-1">
+    <div class="col-6 col-lg-4 sv-animate-in sv-animate-in-1">
         <div class="sv-stat-card" style="--accent-color:#007AFF;">
             <div class="stat-icon"><i class="bi bi-folder2-open"></i></div>
             <div class="stat-label">Total Kunjungan</div>
@@ -22,7 +38,7 @@
             <div class="stat-sub">Seluruh monitoring tercatat</div>
         </div>
     </div>
-    <div class="col-4 sv-animate-in sv-animate-in-2">
+    <div class="col-6 col-lg-4 sv-animate-in sv-animate-in-2">
         <div class="sv-stat-card" style="--accent-color:#34C759;">
             <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
             <div class="stat-label">Stabil</div>
@@ -30,7 +46,7 @@
             <div class="stat-sub">Kondisi terkontrol</div>
         </div>
     </div>
-    <div class="col-4 sv-animate-in sv-animate-in-3">
+    <div class="col-6 col-lg-4 sv-animate-in sv-animate-in-3">
         <div class="sv-stat-card" style="--accent-color:#FF3B30;">
             <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div class="stat-label">Perlu Tindak Lanjut</div>
@@ -40,22 +56,44 @@
     </div>
 </div>
 
-{{-- Filter per patient --}}
+{{-- Filter per patient with search --}}
 <div class="sv-card mb-4 sv-animate-in" style="padding:12px 16px;">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
         <span style="font-size:12.5px;font-weight:600;color:var(--sv-text-muted);">Filter Pasien:</span>
+        <div style="position:relative;flex:1;min-width:160px;max-width:300px;">
+            <i class="bi bi-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#8E8E93;pointer-events:none;"></i>
+            <input type="text" id="rmSearch" placeholder="Cari nama pasien..." oninput="filterRMPatients(this.value)">
+        </div>
+    </div>
+    <div class="filter-scroll" id="rmFilterList">
         <a href="{{ route('admin.rekam-medis.index') }}"
-           class="filter-tab {{ !request('patient_id') ? 'active' : '' }}">
+           class="filter-tab {{ !request('patient_id') ? 'active' : '' }}" data-name="semua">
            Semua ({{ $patients->count() }})
         </a>
         @foreach($patients as $p)
         <a href="{{ route('admin.rekam-medis.index', ['patient_id' => $p->patient_id]) }}"
-           class="filter-tab {{ request('patient_id') === $p->patient_id ? 'active' : '' }}">
+           class="filter-tab {{ request('patient_id') === $p->patient_id ? 'active' : '' }}"
+           data-name="{{ strtolower($p->patient_name) }}">
             {{ $p->patient_name }}
         </a>
         @endforeach
     </div>
 </div>
+
+<script>
+function filterRMPatients(q) {
+    q = q.toLowerCase().trim();
+    const tabs = document.querySelectorAll('#rmFilterList .filter-tab');
+    tabs.forEach(function(tab) {
+        const name = tab.dataset.name || '';
+        if (!q || name.includes(q)) {
+            tab.style.display = '';
+        } else {
+            tab.style.display = 'none';
+        }
+    });
+}
+</script>
 
 {{-- Patient Records --}}
 @if($displayPatients->isEmpty())

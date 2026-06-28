@@ -39,10 +39,11 @@
                     <div class="row g-3">
                         <div class="col-md-5">
                             <label for="patient_id" class="form-label">Pasien <span style="color:#FF3B30;">*</span></label>
-                            <select name="patient_id" id="patient_id" class="form-select" required>
+                            <select name="patient_id" id="patient_id" class="form-select" required onchange="updatePetugas(this)">
                                 <option value="" disabled {{ old('patient_id', $prePatientId) ? '' : 'selected' }}>— Pilih Pasien —</option>
                                 @foreach($patients as $p)
                                 <option value="{{ $p->patient_id }}"
+                                    data-officer="{{ $p->assignedOfficer->name ?? 'Tidak ditugaskan' }}"
                                     {{ old('patient_id', $prePatientId) === $p->patient_id ? 'selected' : '' }}>
                                     {{ $p->patient_name }} — {{ $p->patient_id }}
                                 </option>
@@ -61,9 +62,12 @@
                                    value="{{ old('monitoring_time', date('H:i')) }}">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Petugas Pemeriksa</label>
-                            <input type="text" class="form-control" style="background:#F2F4F7;color:#636366;"
-                                   value="{{ Auth::user()->name ?? 'Petugas' }}" readonly>
+                            <label class="form-label">Petugas</label>
+                            <input type="text" id="petugasDisplay" class="form-control" style="background:#F2F4F7;color:#636366;"
+                                   value="{{ Auth::user()->name ?? 'Petugas' }} ({{ Auth::user()->role ?? 'Petugas' }})" readonly>
+                            <div id="assignedOfficerInfo" style="font-size:11px;color:var(--sv-text-muted);margin-top:4px;">
+                                Pilih pasien untuk melihat petugas yang ditugaskan
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -217,6 +221,26 @@
 
 @section('scripts')
 <script>
+    function updatePetugas(select) {
+        const option = select.options[select.selectedIndex];
+        const petugasInput = document.getElementById('petugasDisplay');
+        const info = document.getElementById('assignedOfficerInfo');
+        if (option && option.dataset.officer) {
+            const officer = option.dataset.officer;
+            petugasInput.value = officer;
+            if (officer === 'Tidak ditugaskan') {
+                info.textContent = 'Pasien belum memiliki petugas yang ditugaskan';
+                info.style.color = '#FF9500';
+            } else {
+                info.textContent = 'Petugas yang bertanggung jawab untuk pasien ini';
+                info.style.color = 'var(--sv-text-muted)';
+            }
+        }
+    }
+    window.addEventListener('DOMContentLoaded', function() {
+        const sel = document.getElementById('patient_id');
+        if (sel && sel.value) updatePetugas(sel);
+    });
     // Real-time Blood Pressure Validation
     document.getElementById('blood_pressure').addEventListener('input', function() {
         const val = this.value.trim();

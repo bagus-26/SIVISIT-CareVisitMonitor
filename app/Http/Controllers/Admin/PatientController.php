@@ -14,14 +14,25 @@ class PatientController extends Controller
 {
     public function index()
     {
-        $patients = Patient::with('monitorings', 'assignedOfficer')->get();
-        return view('patient.pasien', compact('patients'));
+        $user = Auth::user();
+        $patients = Patient::with('monitorings', 'assignedOfficer');
+        if ($user->role === 'petugas') {
+            $patients = $patients->where('assigned_officer_id', $user->id);
+        }
+        return view('patient.pasien', ['patients' => $patients->get()]);
     }
 
     public function create()
     {
         $petugas = User::where('role', 'petugas')->orderBy('name')->get();
-        return view('patient.tambah-pasien', compact('petugas'));
+        $lastPatient = Patient::orderBy('id', 'desc')->first();
+        if ($lastPatient) {
+            $lastNum = (int) substr($lastPatient->patient_id, 1);
+            $nextId = 'P' . str_pad($lastNum + 1, 3, '0', STR_PAD_LEFT);
+        } else {
+            $nextId = 'P001';
+        }
+        return view('patient.tambah-pasien', compact('petugas', 'nextId'));
     }
 
     public function store(StorePatientRequest $request)

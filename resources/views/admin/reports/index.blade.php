@@ -20,39 +20,39 @@
 @endsection
 
 @section('content')
-<div class="sv-page-header sv-animate-in no-print">
+<div class="sv-page-header sv-animate-in no-print" style="margin-bottom:16px;">
     <div>
-        <h1>Laporan Monitoring</h1>
-        <p>Analisis dan statistik monitoring home care</p>
+        <h1 style="font-size:clamp(16px,4vw,22px);">Laporan Monitoring</h1>
+        <p style="font-size:clamp(11.5px,2.5vw,13.5px);">Analisis dan statistik monitoring home care</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
-        <button onclick="window.print()" class="btn btn-primary">
-            <i class="bi bi-printer me-1"></i> Cetak Laporan
+        <button onclick="window.print()" class="btn btn-primary" style="font-size:clamp(11px,2vw,13.5px);">
+            <i class="bi bi-printer me-1"></i> Cetak
         </button>
-        <a href="{{ route('admin.reports.export-pdf') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-file-pdf me-1"></i> Export PDF
+        <a href="{{ route('admin.reports.export-pdf') }}" class="btn btn-outline-secondary" style="font-size:clamp(11px,2vw,13.5px);">
+            <i class="bi bi-file-pdf me-1"></i> PDF
         </a>
-        <a href="{{ route('admin.reports.export-excel') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+        <a href="{{ route('admin.reports.export-excel') }}" class="btn btn-outline-secondary" style="font-size:clamp(11px,2vw,13.5px);">
+            <i class="bi bi-file-earmark-excel me-1"></i> Excel
         </a>
     </div>
 </div>
 
 @if (session('info'))
-    <div class="alert alert-info alert-dismissible fade show no-print" role="alert">
+    <div class="alert alert-info alert-dismissible fade show no-print" role="alert" style="font-size:clamp(11px,2vw,13px);">
         <i class="bi bi-info-circle me-2"></i>{{ session('info') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 @endif
 
 <div class="print-area">
-<div class="row g-3 mb-4 sv-animate-in">
-    <div class="col-12 col-md-6">
-        <div class="sv-card">
-            <div class="sv-card-body">
-                <label class="form-label" style="font-size:12px;color:#8E8E93;text-transform:uppercase;font-weight:600;">Pilih Periode</label>
-                <form method="GET" class="d-flex gap-2">
-                    <input type="month" name="month" class="form-control" value="{{ $monthYear }}" onchange="this.form.submit()">
+<div class="row g-2 g-md-3 mb-3 mb-md-4 sv-animate-in">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="sv-card" style="padding:14px;">
+            <div class="sv-card-body" style="padding:0;">
+                <label class="form-label" style="font-size:clamp(10px,2vw,12px);color:#8E8E93;text-transform:uppercase;font-weight:600;margin-bottom:4px;">Pilih Periode</label>
+                <form method="GET">
+                    <input type="month" name="month" class="form-control" value="{{ $monthYear }}" onchange="this.form.submit()" style="font-size:clamp(12px,2.5vw,14px);">
                 </form>
             </div>
         </div>
@@ -60,184 +60,184 @@
 </div>
 
 {{-- Statistik Ringkas --}}
-<div class="row g-3 mb-4">
+<div class="row g-2 g-md-3 mb-3 mb-md-4">
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-1">
         <div class="sv-stat-card" style="--accent-color:#007AFF;">
             <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-            <div class="stat-label">Total Pasien</div>
-            <div class="stat-value" style="color:#007AFF;">{{ $totalPatients }}</div>
-            <div class="stat-sub">Pasien terdaftar</div>
+            <div class="stat-label" style="font-size:clamp(9px,2vw,11px);">Total Pasien</div>
+            <div class="stat-value" style="color:#007AFF;font-size:clamp(20px,5vw,30px);">{{ $totalPatients }}</div>
+            <div class="stat-sub" style="font-size:clamp(10px,2vw,12px);">Pasien terdaftar</div>
         </div>
     </div>
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-2">
         <div class="sv-stat-card" style="--accent-color:#FF9500;">
             <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
-            <div class="stat-label">Total Monitoring</div>
-            <div class="stat-value" style="color:#FF9500;">{{ $totalMonitorings }}</div>
-            <div class="stat-sub">Periode {{ date('M Y', strtotime($monthYear . '-01')) }}</div>
+            <div class="stat-label" style="font-size:clamp(9px,2vw,11px);">Total Monitoring</div>
+            <div class="stat-value" style="color:#FF9500;font-size:clamp(20px,5vw,30px);">{{ $totalMonitorings }}</div>
+            <div class="stat-sub" style="font-size:clamp(10px,2vw,12px);">Periode {{ date('M Y', strtotime($monthYear . '-01')) }}</div>
         </div>
     </div>
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-3">
         <div class="sv-stat-card" style="--accent-color:#34C759;">
             <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
-            <div class="stat-label">Status Stabil</div>
-            <div class="stat-value" style="color:#34C759;">{{ $totalMonitoringsStable }}</div>
-            <div class="stat-sub">Kondisi pasien stabil</div>
+            <div class="stat-label" style="font-size:clamp(9px,2vw,11px);">Status Stabil</div>
+            <div class="stat-value" style="color:#34C759;font-size:clamp(20px,5vw,30px);">{{ $totalMonitoringsStable }}</div>
+            <div class="stat-sub" style="font-size:clamp(10px,2vw,12px);">Kondisi pasien stabil</div>
         </div>
     </div>
     <div class="col-6 col-lg-3 sv-animate-in sv-animate-in-4">
         <div class="sv-stat-card" style="--accent-color:#FF3B30;">
             <div class="stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <div class="stat-label">Perlu Kontrol</div>
-            <div class="stat-value" style="color:#FF3B30;">{{ $totalMonitoringsNeedControl }}</div>
-            <div class="stat-sub">Butuh tindak lanjut</div>
+            <div class="stat-label" style="font-size:clamp(9px,2vw,11px);">Perlu Kontrol</div>
+            <div class="stat-value" style="color:#FF3B30;font-size:clamp(20px,5vw,30px);">{{ $totalMonitoringsNeedControl }}</div>
+            <div class="stat-sub" style="font-size:clamp(10px,2vw,12px);">Butuh tindak lanjut</div>
         </div>
     </div>
 </div>
 
-<div class="row g-3">
+<div class="row g-2 g-md-3">
     {{-- Monitoring Harian --}}
     <div class="col-12 col-xl-8 sv-animate-in">
         <div class="sv-table-wrap">
-            <div class="sv-section-header">
-                <h5><i class="bi bi-calendar-event me-2" style="color:var(--sv-blue);"></i>Monitoring Harian</h5>
+            <div class="sv-section-header" style="padding:10px 14px;">
+                <h5 style="font-size:clamp(12px,2.5vw,15px);"><i class="bi bi-calendar-event me-2" style="color:var(--sv-blue);"></i>Monitoring Harian</h5>
             </div>
-            <table class="table mb-0" style="font-size:13px;">
+            <div class="table-responsive">
+            <table class="table mb-0" style="font-size:clamp(11px,2vw,13px);min-width:400px;">
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Total Monitoring</th>
-                        <th>Status Stabil</th>
-                        <th>Perlu Kontrol</th>
-                        <th>Persentase</th>
+                        <th style="font-size:clamp(9px,1.8vw,11px);">Tanggal</th>
+                        <th style="font-size:clamp(9px,1.8vw,11px);">Monitoring</th>
+                        <th class="d-none d-sm-table-cell" style="font-size:clamp(9px,1.8vw,11px);">Stabil</th>
+                        <th class="d-none d-sm-table-cell" style="font-size:clamp(9px,1.8vw,11px);">Kontrol</th>
+                        <th style="font-size:clamp(9px,1.8vw,11px);">Persentase</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($dailyMonitorings as $dm)
                     <tr>
-                        <td style="font-weight:600;">{{ date('d M Y', strtotime($dm->date)) }}</td>
-                        <td>{{ $dm->count }}</td>
-                        <td><span class="sv-badge sv-badge-stable">{{ $dm->stable_count }}</span></td>
-                        <td><span class="sv-badge sv-badge-control">{{ $dm->control_count }}</span></td>
+                        <td style="font-weight:600;font-size:clamp(10px,2vw,13px);">{{ date('d M', strtotime($dm->date)) }}</td>
+                        <td style="font-size:clamp(10px,2vw,13px);">{{ $dm->count }}</td>
+                        <td class="d-none d-sm-table-cell"><span class="sv-badge sv-badge-stable" style="font-size:clamp(9px,1.6vw,11.5px);">{{ $dm->stable_count }}</span></td>
+                        <td class="d-none d-sm-table-cell"><span class="sv-badge sv-badge-control" style="font-size:clamp(9px,1.6vw,11.5px);">{{ $dm->control_count }}</span></td>
                         <td>
                             @php
                                 $percentage = $dm->count > 0 ? round(($dm->stable_count / $dm->count) * 100) : 0;
                             @endphp
-                            <div class="progress" style="height:6px;background:#E5E7EB;">
-                                <div class="progress-bar bg-success" style="width: {{ $percentage }}%;"></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:5px;background:#E5E7EB;min-width:40px;">
+                                    <div class="progress-bar bg-success" style="width: {{ $percentage }}%;"></div>
+                                </div>
+                                <span style="font-size:clamp(9px,1.6vw,11.5px);white-space:nowrap;">{{ $percentage }}%</span>
                             </div>
-                            {{ $percentage }}%
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="5">
-                            <div class="sv-empty-state">
-                                <i class="bi bi-graph-up" style="font-size:40px;color:#D1D5DB;"></i>
-                                <p>Belum ada data monitoring untuk periode ini.</p>
+                            <div class="sv-empty-state" style="padding:24px 12px;">
+                                <i class="bi bi-graph-up" style="font-size:28px;color:#D1D5DB;"></i>
+                                <p style="font-size:clamp(12px,2.5vw,14px);">Belum ada data monitoring untuk periode ini.</p>
                             </div>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
     {{-- Monitoring per Petugas --}}
     <div class="col-12 col-xl-4 sv-animate-in">
-        <div class="sv-card">
-            <div class="sv-card-header">
-                <h5><i class="bi bi-person-check me-2" style="color:var(--sv-blue);"></i>Monitoring per Petugas</h5>
-            </div>
-            <div class="sv-card-body">
-                @forelse($monitoringsByStaff as $staff)
-                    <div class="mb-3 pb-3" style="border-bottom:1px solid #E5E7EB;">
-                        <div style="font-weight:600;margin-bottom:5px;">{{ $staff->name }}</div>
-                        <div style="font-size:12px;color:#636366;margin-bottom:8px;">
-                            Total: <strong>{{ $staff->total }}</strong> | Stabil: <strong style="color:#34C759;">{{ $staff->stable }}</strong>
-                        </div>
-                        @php
-                            $staffPercentage = $staff->total > 0 ? round(($staff->stable / $staff->total) * 100) : 0;
-                        @endphp
-                        <div class="progress" style="height:6px;background:#E5E7EB;">
+        <div class="sv-card" style="padding:14px;">
+            <h5 style="font-size:clamp(12px,2.5vw,15px);margin:0 0 12px;"><i class="bi bi-person-check me-2" style="color:var(--sv-blue);"></i>Per Petugas</h5>
+            @forelse($monitoringsByStaff as $staff)
+                <div class="mb-3 pb-3" style="border-bottom:1px solid #E5E7EB;">
+                    <div style="font-weight:600;font-size:clamp(11px,2vw,13.5px);margin-bottom:4px;">{{ $staff->name }}</div>
+                    <div style="font-size:clamp(10px,2vw,12px);color:#636366;margin-bottom:6px;">
+                        Total: <strong>{{ $staff->total }}</strong> | Stabil: <strong style="color:#34C759;">{{ $staff->stable }}</strong>
+                    </div>
+                    @php
+                        $staffPercentage = $staff->total > 0 ? round(($staff->stable / $staff->total) * 100) : 0;
+                    @endphp
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="progress flex-grow-1" style="height:5px;background:#E5E7EB;">
                             <div class="progress-bar bg-success" style="width: {{ $staffPercentage }}%;"></div>
                         </div>
-                        <small style="color:#8E8E93;">{{ $staffPercentage }}% stabil</small>
+                        <small style="color:#8E8E93;font-size:clamp(9px,1.6vw,11px);">{{ $staffPercentage }}%</small>
                     </div>
-                @empty
-                    <div class="sv-empty-state">
-                        <i class="bi bi-inbox" style="font-size:30px;color:#D1D5DB;"></i>
-                        <p style="font-size:12px;">Belum ada data petugas.</p>
-                    </div>
-                @endforelse
-            </div>
+                </div>
+            @empty
+                <div class="sv-empty-state" style="padding:16px 0;">
+                    <i class="bi bi-inbox" style="font-size:24px;color:#D1D5DB;"></i>
+                    <p style="font-size:clamp(11px,2vw,12px);">Belum ada data petugas.</p>
+                </div>
+            @endforelse
         </div>
     </div>
 </div>
 
-<div class="row g-3" style="margin-top:10px;">
+<div class="row g-2 g-md-3 mt-2 mt-md-3">
     {{-- Pasien per Lokasi --}}
     <div class="col-12 col-xl-6 sv-animate-in">
-        <div class="sv-card">
-            <div class="sv-card-header">
-                <h5><i class="bi bi-geo-alt me-2" style="color:var(--sv-blue);"></i>Sebaran Pasien per Lokasi</h5>
-            </div>
-            <table class="table table-sm mb-0" style="font-size:13px;">
+        <div class="sv-card" style="padding:14px;">
+            <h5 style="font-size:clamp(12px,2.5vw,15px);margin:0 0 12px;"><i class="bi bi-geo-alt me-2" style="color:var(--sv-blue);"></i>Sebaran Pasien per Lokasi</h5>
+            <div class="table-responsive">
+            <table class="table table-sm mb-0" style="font-size:clamp(11px,2vw,13px);min-width:300px;">
                 <thead>
                     <tr>
-                        <th>Lokasi</th>
-                        <th>Jumlah Pasien</th>
-                        <th>Persentase</th>
+                        <th style="font-size:clamp(9px,1.8vw,11px);">Lokasi</th>
+                        <th style="font-size:clamp(9px,1.8vw,11px);">Jumlah</th>
+                        <th style="font-size:clamp(9px,1.8vw,11px);">Persentase</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($patientsByLocation as $location)
                     <tr>
-                        <td style="font-weight:500;">{{ $location->location ?? 'Tidak Ada' }}</td>
-                        <td>{{ $location->count }}</td>
+                        <td style="font-weight:500;font-size:clamp(10px,2vw,13px);">{{ $location->location ?? 'Tidak Ada' }}</td>
+                        <td style="font-size:clamp(10px,2vw,13px);">{{ $location->count }}</td>
                         <td>
                             @php
                                 $locPercentage = $totalPatients > 0 ? round(($location->count / $totalPatients) * 100) : 0;
                             @endphp
-                            <div class="progress" style="height:6px;background:#E5E7EB;">
-                                <div class="progress-bar bg-info" style="width: {{ $locPercentage }}%;"></div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height:5px;background:#E5E7EB;min-width:40px;">
+                                    <div class="progress-bar bg-info" style="width: {{ $locPercentage }}%;"></div>
+                                </div>
+                                <span style="font-size:clamp(9px,1.6vw,11px);white-space:nowrap;">{{ $locPercentage }}%</span>
                             </div>
-                            {{ $locPercentage }}%
                         </td>
                     </tr>
                     @empty
                     <tr>
                         <td colspan="3">
                             <div class="text-center py-3">
-                                <small class="text-muted">Belum ada data lokasi pasien</small>
+                                <small class="text-muted" style="font-size:clamp(10px,2vw,12px);">Belum ada data lokasi pasien</small>
                             </div>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
     {{-- Catatan Laporan --}}
     <div class="col-12 col-xl-6 sv-animate-in">
-        <div class="sv-card">
-            <div class="sv-card-header">
-                <h5><i class="bi bi-info-circle me-2" style="color:var(--sv-blue);"></i>Informasi Laporan</h5>
+        <div class="sv-card" style="padding:14px;">
+            <h5 style="font-size:clamp(12px,2.5vw,15px);margin:0 0 12px;"><i class="bi bi-info-circle me-2" style="color:var(--sv-blue);"></i>Informasi Laporan</h5>
+            <div class="alert alert-info mb-3" style="font-size:clamp(10px,2vw,13px);">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Periode:</strong> {{ date('d M Y', strtotime($monthYear . '-01')) }} - {{ date('d M Y', strtotime($monthYear . '-01 +1 month -1 day')) }}
             </div>
-            <div class="sv-card-body">
-                <div class="alert alert-info mb-3">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <strong>Periode Laporan:</strong> {{ date('d F Y', strtotime($monthYear . '-01')) }} - {{ date('d F Y', strtotime($monthYear . '-01 +1 month -1 day')) }}
-                </div>
-                <ul style="font-size:13px;line-height:1.8;color:#636366;list-style:none;padding:0;">
-                    <li><i class="bi bi-check-circle text-success me-2"></i>Total Pasien Terdaftar: <strong>{{ $totalPatients }}</strong></li>
-                    <li><i class="bi bi-check-circle text-success me-2"></i>Total Monitoring: <strong>{{ $totalMonitorings }}</strong></li>
-                    <li><i class="bi bi-check-circle text-success me-2"></i>Kondisi Stabil: <strong>{{ $totalMonitoringsStable }}</strong></li>
-                    <li><i class="bi bi-exclamation-triangle text-warning me-2"></i>Perlu Kontrol: <strong>{{ $totalMonitoringsNeedControl }}</strong></li>
-                </ul>
-            </div>
+            <ul style="font-size:clamp(11px,2vw,13px);line-height:1.8;color:#636366;list-style:none;padding:0;margin:0;">
+                <li><i class="bi bi-check-circle text-success me-2"></i>Total Pasien Terdaftar: <strong>{{ $totalPatients }}</strong></li>
+                <li><i class="bi bi-check-circle text-success me-2"></i>Total Monitoring: <strong>{{ $totalMonitorings }}</strong></li>
+                <li><i class="bi bi-check-circle text-success me-2"></i>Kondisi Stabil: <strong>{{ $totalMonitoringsStable }}</strong></li>
+                <li><i class="bi bi-exclamation-triangle text-warning me-2"></i>Perlu Kontrol: <strong>{{ $totalMonitoringsNeedControl }}</strong></li>
+            </ul>
         </div>
     </div>
 </div>
